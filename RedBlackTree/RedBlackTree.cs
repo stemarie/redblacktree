@@ -234,7 +234,7 @@ namespace System.Collections.Generic.RedBlack
         ///</summary>
         public bool IsEmpty()
         {
-            return (_treeBaseNode == null);
+            return (_treeBaseNode == SentinelNode);
         }
 
         ///<summary>
@@ -521,9 +521,13 @@ namespace System.Collections.Generic.RedBlack
 
         private RedBlackNode<T> GetNode(IComparable key)
         {
-            int result = key.CompareTo(_lastNodeFound.Data);
-            if (result == 0)
-                return _lastNodeFound;
+            int result;
+            if (_lastNodeFound != SentinelNode)
+            {
+                result = key.CompareTo(_lastNodeFound.Data);
+                if (result == 0)
+                    return _lastNodeFound;
+            }
 
             RedBlackNode<T> treeNode = _treeBaseNode; // begin at root
 
