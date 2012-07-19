@@ -2,3 +2,4 @@ _ReSharper.*/
 bin/
 obj/
 *.user
+*.suo

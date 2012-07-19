@@ -7,8 +7,8 @@
 
 namespace System.Collections.Generic.RedBlack
 {
-    public class RedBlack<T> : IEnumerable<T> where T
-        : class, IComparable<T>
+    public class RedBlackTree<T> : ICollection<T>
+        where T : class, IComparable
     {
         public enum RedBlackNodeType
         {
@@ -20,37 +20,36 @@ namespace System.Collections.Generic.RedBlack
         // if it is "unique" enough.
         // The IComparable interface would need to be replaced with int.
         private int _intHashCode;
+
         // identifies the owner of the tree
         private string _strIdentifier;
+
         // the tree
         private RedBlackNode<T> _treeBaseNode = SentinelNode;
-
-        // sentinelNode is convenient way of indicating a leaf node.
-        // set up the sentinel node. the sentinel node is the key to a successfull
-        // implementation and for understanding the red-black tree properties.
-        protected internal static readonly RedBlackNode<T> SentinelNode =
-            new RedBlackNode<T>
-                {
-                    Left = null,
-                    Right = null,
-                    Parent = null,
-                    Color = RedBlackNodeType.Black
-                };
 
         // the node that was last found; used to optimize searches
         private RedBlackNode<T> _lastNodeFound = SentinelNode;
 
-        // locking object to accomodate multi-threading
-        private readonly object _lock = new object();
-
         private readonly Random _rand = new Random();
 
-        public RedBlack()
+        // sentinelNode is convenient way of indicating a leaf node.
+        // set up the sentinel node. the sentinel node is the key to a successfull
+        // implementation and for understanding the red-black tree properties.
+        internal static readonly RedBlackNode<T> SentinelNode =
+            new RedBlackNode<T>
+            {
+                Left = null,
+                Right = null,
+                Parent = null,
+                Color = RedBlackNodeType.Black
+            };
+
+        public RedBlackTree()
         {
             Initialize(base.ToString() + _rand.Next());
         }
 
-        public RedBlack(string strIdentifier)
+        public RedBlackTree(string strIdentifier)
         {
             Initialize(strIdentifier);
         }
@@ -61,7 +60,38 @@ namespace System.Collections.Generic.RedBlack
             set { GetNode(key).Data = value; }
         }
 
+        /// <summary>
+        /// Removes the first occurrence of a specific object from the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+        /// </summary>
+        /// <returns>
+        /// true if <paramref name="item"/> was successfully removed from the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, false. This method also returns false if <paramref name="item"/> is not found in the original <see cref="T:System.Collections.Generic.ICollection`1"/>.
+        /// </returns>
+        /// <param name="item">The object to remove from the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.</exception>
+        public bool Remove(T item)
+        {
+            try
+            {
+                Delete(GetNode(item));
+                return true;
+            }
+            catch (RedBlackException)
+            {
+                return false;
+            }
+        }
+
         public int Count { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.
+        /// </summary>
+        /// <returns>
+        /// true if the <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only; otherwise, false.
+        /// </returns>
+        public bool IsReadOnly
+        {
+            get { return false; }
+        }
 
         ///<summary>
         /// Add
@@ -74,38 +104,36 @@ namespace System.Collections.Generic.RedBlack
                 throw (new RedBlackException(Properties.Resources.ExceptionNodeKeyAndDataMustNotBeNull));
 
             // traverse tree - find where node belongs
-            int result;
             // create new node
-            RedBlackNode<T> node = new RedBlackNode<T>(data);
-            RedBlackNode<T> temp = _treeBaseNode; // grab the rbTree node of the tree
+            RedBlackNode<T> _newNode = new RedBlackNode<T>(data);
+            RedBlackNode<T> _workNode = _treeBaseNode; // grab the rbTree node of the tree
 
-            while (temp != SentinelNode)
+            while (_workNode != SentinelNode)
             {
                 // find Parent
-                node.Parent = temp;
-                result = data.CompareTo(temp.Data);
+                _newNode.Parent = _workNode;
+                int result = data.CompareTo(_workNode.Data);
                 if (result == 0)
                     throw (new RedBlackException(Properties.Resources.ExceptionNodeWithSameKeyAlreadyExists));
-                temp = result > 0 ? temp.Right : temp.Left;
+                _workNode = result > 0 ? _workNode.Right : _workNode.Left;
             }
 
             // insert node into tree starting at parent's location
-            if (node.Parent != null)
+            if (_newNode.Parent != null)
             {
-                result = node.Data.CompareTo(node.Parent.Data);
-                if (result > 0)
-                    node.Parent.Right = node;
+                if (_newNode.Data.CompareTo(_newNode.Parent.Data) > 0)
+                    _newNode.Parent.Right = _newNode;
                 else
-                    node.Parent.Left = node;
+                    _newNode.Parent.Left = _newNode;
             }
             else
-                _treeBaseNode = node; // first node added
+                _treeBaseNode = _newNode; // first node added
 
-            BalanceTreeAfterInsert(node); // restore red-black properties
+            BalanceTreeAfterInsert(_newNode); // restore red-black properties
 
-            _lastNodeFound = node;
+            _lastNodeFound = _newNode;
 
-            Count = Count + 1;
+            Count++;
         }
 
         ///<summary>
@@ -123,18 +151,18 @@ namespace System.Collections.Generic.RedBlack
         ///</summary>
         public IComparable GetMinKey()
         {
-            RedBlackNode<T> treeNode = _treeBaseNode;
+            RedBlackNode<T> _workNode = _treeBaseNode;
 
-            if (treeNode == null || treeNode == SentinelNode)
+            if (_workNode == null || _workNode == SentinelNode)
                 throw (new RedBlackException(Properties.Resources.ExceptionTreeIsEmpty));
 
             // traverse to the extreme left to find the smallest key
-            while (treeNode.Left != SentinelNode)
-                treeNode = treeNode.Left;
+            while (_workNode.Left != SentinelNode)
+                _workNode = _workNode.Left;
 
-            _lastNodeFound = treeNode;
+            _lastNodeFound = _workNode;
 
-            return treeNode.Data as IComparable;
+            return _workNode.Data;
         }
 
         ///<summary>
@@ -143,18 +171,18 @@ namespace System.Collections.Generic.RedBlack
         ///</summary>
         public IComparable GetMaxKey()
         {
-            RedBlackNode<T> treeNode = _treeBaseNode;
+            RedBlackNode<T> _workNode = _treeBaseNode;
 
-            if (treeNode == null || treeNode == SentinelNode)
+            if (_workNode == null || _workNode == SentinelNode)
                 throw (new RedBlackException(Properties.Resources.ExceptionTreeIsEmpty));
 
             // traverse to the extreme right to find the largest key
-            while (treeNode.Right != SentinelNode)
-                treeNode = treeNode.Right;
+            while (_workNode.Right != SentinelNode)
+                _workNode = _workNode.Right;
 
-            _lastNodeFound = treeNode;
+            _lastNodeFound = _workNode;
 
-            return treeNode.Data as IComparable;
+            return _workNode.Data;
         }
 
         ///<summary>
@@ -181,6 +209,13 @@ namespace System.Collections.Generic.RedBlack
         ///</summary>
         public IEnumerator<T> GetEnumerator()
         {
+            Stack<T> stack = GetAll();
+
+            return stack.GetEnumerator();
+        }
+
+        private Stack<T> GetAll()
+        {
             Stack<T> stack = new Stack<T>();
 
             // use depth-first traversal to push nodes into stack
@@ -190,8 +225,7 @@ namespace System.Collections.Generic.RedBlack
             {
                 WalkNextLevel(_treeBaseNode, stack);
             }
-
-            return stack.GetEnumerator();
+            return stack;
         }
 
         ///<summary>
@@ -256,6 +290,49 @@ namespace System.Collections.Generic.RedBlack
             Count = 0;
         }
 
+        /// <summary>
+        /// Determines whether the <see cref="T:System.Collections.Generic.ICollection`1"/> contains a specific value.
+        /// </summary>
+        /// <returns>
+        /// true if <paramref name="item"/> is found in the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, false.
+        /// </returns>
+        /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
+        public bool Contains(T item)
+        {
+            try
+            {
+                return GetData(item) != null;
+            }
+            catch (RedBlackException)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1"/> to an <see cref="T:System.Array"/>, starting at a particular <see cref="T:System.Array"/> index.
+        /// </summary>
+        /// <param name="array">The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1"/>. The <see cref="T:System.Array"/> must have zero-based indexing.</param>
+        /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="array"/> is null.</exception>
+        /// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="arrayIndex"/> is less than 0.</exception>
+        /// <exception cref="T:System.ArgumentException"><paramref name="array"/> is multidimensional.-or-The number of elements in the source <see cref="T:System.Collections.Generic.ICollection`1"/> is greater than the available space from <paramref name="arrayIndex"/> to the end of the destination <paramref name="array"/>.-or-Type <paramref name="T"/> cannot be cast automatically to the type of the destination <paramref name="array"/>.</exception>
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            if (arrayIndex < 0)
+                throw new ArgumentOutOfRangeException();
+            if (array == null)
+                throw new ArgumentNullException();
+            if ((array.Length - arrayIndex) < Count)
+                throw new ArgumentException();
+            int _currentPosition = arrayIndex;
+            foreach (T item in GetAll())
+            {
+                array[_currentPosition] = item;
+                _currentPosition++;
+            }
+        }
+
         ///<summary>
         /// Equals
         ///</summary>
@@ -306,47 +383,47 @@ namespace System.Collections.Generic.RedBlack
             // If the deleted node is red, the red black properties still hold.
             // If the deleted node is black, the tree needs rebalancing
 
-            RedBlackNode<T> y;					// work node 
+            RedBlackNode<T> _workNode;					// work node 
 
             // find the replacement node (the successor to x) - the node one with 
             // at *most* one child. 
             if (node.Left == SentinelNode || node.Right == SentinelNode)
-                y = node;						// node has sentinel as a child
+                _workNode = node;						// node has sentinel as a child
             else
             {
                 // z has two children, find replacement node which will 
                 // be the leftmost node greater than z
-                y = node.Right;				        // traverse right subtree	
-                while (y.Left != SentinelNode)		// to find next node in sequence
-                    y = y.Left;
+                _workNode = node.Right;				        // traverse right subtree	
+                while (_workNode.Left != SentinelNode)		// to find next node in sequence
+                    _workNode = _workNode.Left;
             }
 
             // at this point, y contains the replacement node. it's content will be copied 
             // to the valules in the node to be deleted
 
             // x (y's only child) is the node that will be linked to y's old parent. 
-            RedBlackNode<T> x = y.Left != SentinelNode ? y.Left : y.Right;
+            RedBlackNode<T> x = _workNode.Left != SentinelNode ? _workNode.Left : _workNode.Right;
 
             // replace x's parent with y's parent and
             // link x to proper subtree in parent
             // this removes y from the chain
-            x.Parent = y.Parent;
-            if (y.Parent != null)
-                if (y == y.Parent.Left)
-                    y.Parent.Left = x;
+            x.Parent = _workNode.Parent;
+            if (_workNode.Parent != null)
+                if (_workNode == _workNode.Parent.Left)
+                    _workNode.Parent.Left = x;
                 else
-                    y.Parent.Right = x;
+                    _workNode.Parent.Right = x;
             else
                 _treeBaseNode = x;			// make x the root node
 
             // copy the values from y (the replacement node) to the node being deleted.
             // note: this effectively deletes the node. 
-            if (y != node)
+            if (_workNode != node)
             {
-                node.Data = y.Data;
+                node.Data = _workNode.Data;
             }
 
-            if (y.Color == RedBlackNodeType.Black)
+            if (_workNode.Color == RedBlackNodeType.Black)
                 BalanceTreeAfterDelete(x);
 
             _lastNodeFound = SentinelNode;
@@ -362,70 +439,69 @@ namespace System.Collections.Generic.RedBlack
         {
             // maintain Red-Black tree balance after deleting node 			
 
-            RedBlackNode<T> tempWorkNode;
-
             while (node != _treeBaseNode && node.Color == RedBlackNodeType.Black)
             {
+                RedBlackNode<T> _workNode;
                 if (node == node.Parent.Left)			// determine sub tree from parent
                 {
-                    tempWorkNode = node.Parent.Right;			// y is x's sibling 
-                    if (tempWorkNode.Color == RedBlackNodeType.Red)
+                    _workNode = node.Parent.Right;			// y is x's sibling 
+                    if (_workNode.Color == RedBlackNodeType.Red)
                     {	// x is black, y is red - make both black and rotate
                         node.Parent.Color = RedBlackNodeType.Red;
-                        tempWorkNode.Color = RedBlackNodeType.Black;
+                        _workNode.Color = RedBlackNodeType.Black;
                         RotateLeft(node.Parent);
-                        tempWorkNode = node.Parent.Right;
+                        _workNode = node.Parent.Right;
                     }
-                    if (tempWorkNode.Left.Color == RedBlackNodeType.Black &&
-                        tempWorkNode.Right.Color == RedBlackNodeType.Black)
+                    if (_workNode.Left.Color == RedBlackNodeType.Black &&
+                        _workNode.Right.Color == RedBlackNodeType.Black)
                     {	// children are both black
-                        tempWorkNode.Color = RedBlackNodeType.Red;		// change parent to red
+                        _workNode.Color = RedBlackNodeType.Red;		// change parent to red
                         node = node.Parent;					// move up the tree
                     }
                     else
                     {
-                        if (tempWorkNode.Right.Color == RedBlackNodeType.Black)
+                        if (_workNode.Right.Color == RedBlackNodeType.Black)
                         {
-                            tempWorkNode.Left.Color = RedBlackNodeType.Black;
-                            tempWorkNode.Color = RedBlackNodeType.Red;
-                            RotateRight(tempWorkNode);
-                            tempWorkNode = node.Parent.Right;
+                            _workNode.Left.Color = RedBlackNodeType.Black;
+                            _workNode.Color = RedBlackNodeType.Red;
+                            RotateRight(_workNode);
+                            _workNode = node.Parent.Right;
                         }
                         node.Parent.Color = RedBlackNodeType.Black;
-                        tempWorkNode.Color = node.Parent.Color;
-                        tempWorkNode.Right.Color = RedBlackNodeType.Black;
+                        _workNode.Color = node.Parent.Color;
+                        _workNode.Right.Color = RedBlackNodeType.Black;
                         RotateLeft(node.Parent);
                         node = _treeBaseNode;
                     }
                 }
                 else
                 {	// right subtree - same as code above with right and left swapped
-                    tempWorkNode = node.Parent.Left;
-                    if (tempWorkNode.Color == RedBlackNodeType.Red)
+                    _workNode = node.Parent.Left;
+                    if (_workNode.Color == RedBlackNodeType.Red)
                     {
                         node.Parent.Color = RedBlackNodeType.Red;
-                        tempWorkNode.Color = RedBlackNodeType.Black;
+                        _workNode.Color = RedBlackNodeType.Black;
                         RotateRight(node.Parent);
-                        tempWorkNode = node.Parent.Left;
+                        _workNode = node.Parent.Left;
                     }
-                    if (tempWorkNode.Right.Color == RedBlackNodeType.Black &&
-                        tempWorkNode.Left.Color == RedBlackNodeType.Black)
+                    if (_workNode.Right.Color == RedBlackNodeType.Black &&
+                        _workNode.Left.Color == RedBlackNodeType.Black)
                     {
-                        tempWorkNode.Color = RedBlackNodeType.Red;
+                        _workNode.Color = RedBlackNodeType.Red;
                         node = node.Parent;
                     }
                     else
                     {
-                        if (tempWorkNode.Left.Color == RedBlackNodeType.Black)
+                        if (_workNode.Left.Color == RedBlackNodeType.Black)
                         {
-                            tempWorkNode.Right.Color = RedBlackNodeType.Black;
-                            tempWorkNode.Color = RedBlackNodeType.Red;
-                            RotateLeft(tempWorkNode);
-                            tempWorkNode = node.Parent.Left;
+                            _workNode.Right.Color = RedBlackNodeType.Black;
+                            _workNode.Color = RedBlackNodeType.Red;
+                            RotateLeft(_workNode);
+                            _workNode = node.Parent.Left;
                         }
-                        tempWorkNode.Color = node.Parent.Color;
+                        _workNode.Color = node.Parent.Color;
                         node.Parent.Color = RedBlackNodeType.Black;
-                        tempWorkNode.Left.Color = RedBlackNodeType.Black;
+                        _workNode.Left.Color = RedBlackNodeType.Black;
                         RotateRight(node.Parent);
                         node = _treeBaseNode;
                     }
@@ -475,32 +551,32 @@ namespace System.Collections.Generic.RedBlack
             // replaces x (since x < y), and y's Right child becomes x's Left child 
             // (since it's < x but > y).
 
-            RedBlackNode<T> y = node.Left;			// get x's Left node, this becomes y
+            RedBlackNode<T> _workNode = node.Left;			// get x's Left node, this becomes y
 
             // set x's Right link
-            node.Left = y.Right;					// y's Right child becomes x's Left child
+            node.Left = _workNode.Right;					// y's Right child becomes x's Left child
 
             // modify parents
-            if (y.Right != SentinelNode)
-                y.Right.Parent = node;				// sets y's Right Parent to x
+            if (_workNode.Right != SentinelNode)
+                _workNode.Right.Parent = node;				// sets y's Right Parent to x
 
-            if (y != SentinelNode)
-                y.Parent = node.Parent;			// set y's Parent to x's Parent
+            if (_workNode != SentinelNode)
+                _workNode.Parent = node.Parent;			// set y's Parent to x's Parent
 
             if (node.Parent != null)				// null=rbTree, could also have used rbTree
             {	// determine which side of it's Parent x was on
                 if (node == node.Parent.Right)
-                    node.Parent.Right = y;			// set Right Parent to y
+                    node.Parent.Right = _workNode;			// set Right Parent to y
                 else
-                    node.Parent.Left = y;			// set Left Parent to y
+                    node.Parent.Left = _workNode;			// set Left Parent to y
             }
             else
-                _treeBaseNode = y;						// at rbTree, set it to y
+                _treeBaseNode = _workNode;						// at rbTree, set it to y
 
             // link x and y 
-            y.Right = node;						// put x on y's Right
+            _workNode.Right = node;						// put x on y's Right
             if (node != SentinelNode)				// set y as x's Parent
-                node.Parent = y;
+                node.Parent = _workNode;
         }
 
         ///<summary>
@@ -513,32 +589,32 @@ namespace System.Collections.Generic.RedBlack
             // replaces x (since y > x), and y's Left child becomes x's Right child 
             // (since it's < y but > x).
 
-            RedBlackNode<T> y = node.Right;			// get x's Right node, this becomes y
+            RedBlackNode<T> _workNode = node.Right;			// get x's Right node, this becomes y
 
             // set x's Right link
-            node.Right = y.Left;					// y's Left child's becomes x's Right child
+            node.Right = _workNode.Left;					// y's Left child's becomes x's Right child
 
             // modify parents
-            if (y.Left != SentinelNode)
-                y.Left.Parent = node;				// sets y's Left Parent to x
+            if (_workNode.Left != SentinelNode)
+                _workNode.Left.Parent = node;				// sets y's Left Parent to x
 
-            if (y != SentinelNode)
-                y.Parent = node.Parent;			// set y's Parent to x's Parent
+            if (_workNode != SentinelNode)
+                _workNode.Parent = node.Parent;			// set y's Parent to x's Parent
 
             if (node.Parent != null)
             {	// determine which side of it's Parent x was on
                 if (node == node.Parent.Left)
-                    node.Parent.Left = y;			// set Left Parent to y
+                    node.Parent.Left = _workNode;			// set Left Parent to y
                 else
-                    node.Parent.Right = y;			// set Right Parent to y
+                    node.Parent.Right = _workNode;			// set Right Parent to y
             }
             else
-                _treeBaseNode = y;						// at rbTree, set it to y
+                _treeBaseNode = _workNode;						// at rbTree, set it to y
 
             // link x and y 
-            y.Left = node;							// put x on y's Left 
+            _workNode.Left = node;							// put x on y's Left 
             if (node != SentinelNode)						// set y as x's Parent
-                node.Parent = y;
+                node.Parent = _workNode;
         }
 
         private void Initialize(string identifier)
@@ -558,12 +634,11 @@ namespace System.Collections.Generic.RedBlack
             // x and y are used as variable names for brevity, in a more formal
             // implementation, you should probably change the names
 
-            RedBlackNode<T> workNode;
-
             // maintain red-black tree properties after adding newNode
             while (node != _treeBaseNode && node.Parent.Color == RedBlackNodeType.Red)
             {
                 // Parent node is .Colored red; 
+                RedBlackNode<T> workNode;
                 if (node.Parent == node.Parent.Parent.Left)	// determine traversal path			
                 {										// is it on the Left or Right subtree?
                     workNode = node.Parent.Parent.Right;			// get uncle

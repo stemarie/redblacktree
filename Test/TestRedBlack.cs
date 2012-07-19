@@ -6,7 +6,7 @@ namespace Test
 {
     sealed class TestRedBlack
     {
-        static readonly RedBlack<MyObj> redBlack = new RedBlack<MyObj>();
+        static readonly RedBlackTree<MyObj> RedBlackTree = new RedBlackTree<MyObj>();
 
         static public void Main()
         {
@@ -28,23 +28,23 @@ namespace Test
             try
             {
                 // format: Add(key, value)
-                redBlack.Add(obj1);
-                redBlack.Add(obj2);
-                redBlack.Add(obj3);
-                redBlack.Add(obj4);
-                redBlack.Add(obj5);
-                redBlack.Add(obj6);
-                redBlack.Add(obj7);
-                redBlack.Add(obj8);
-                redBlack.Add(obj9);
-                redBlack.Add(obj10);
-                redBlack.Add(obj11);
-                redBlack.Add(obj12);
-                redBlack.Add(obj13);
+                RedBlackTree.Add(obj1);
+                RedBlackTree.Add(obj2);
+                RedBlackTree.Add(obj3);
+                RedBlackTree.Add(obj4);
+                RedBlackTree.Add(obj5);
+                RedBlackTree.Add(obj6);
+                RedBlackTree.Add(obj7);
+                RedBlackTree.Add(obj8);
+                RedBlackTree.Add(obj9);
+                RedBlackTree.Add(obj10);
+                RedBlackTree.Add(obj11);
+                RedBlackTree.Add(obj12);
+                RedBlackTree.Add(obj13);
 
                 Console.WriteLine(Environment.NewLine);
 
-                IEnumerator<MyObj> items = redBlack.GetEnumerator();
+                IEnumerator<MyObj> items = RedBlackTree.GetEnumerator();
 
                 Enumerate(items);
 
@@ -53,31 +53,31 @@ namespace Test
                 DumpMinMaxValue();
                 Console.WriteLine(Environment.NewLine);
 
-                MyKey tObjKey = (MyKey)redBlack.GetMinKey();
-                MyObj tObj = redBlack.GetData(tObjKey);
+                IComparable tObjKey = RedBlackTree.GetMinKey();
+                MyObj tObj = RedBlackTree.GetData(tObjKey);
                 Console.WriteLine(@"Remove Min Key: " + tObj.Data);
                 Console.WriteLine(Environment.NewLine);
-                redBlack.Remove(tObjKey);
+                RedBlackTree.Remove(tObjKey);
 
                 Console.WriteLine(Environment.NewLine);
 
-                Console.WriteLine(@"Remove Max Value:" + redBlack.GetMaxValue());
-                redBlack.RemoveMax();
-                Console.WriteLine(@"Remove Min Value:" + redBlack.GetMinValue());
-                redBlack.RemoveMin();
+                Console.WriteLine(@"Remove Max Value:" + RedBlackTree.GetMaxValue());
+                RedBlackTree.RemoveMax();
+                Console.WriteLine(@"Remove Min Value:" + RedBlackTree.GetMinValue());
+                RedBlackTree.RemoveMin();
                 Console.WriteLine(Environment.NewLine);
 
                 Console.WriteLine(Environment.NewLine);
 
-                Console.WriteLine(@"Remove Min Key:" + redBlack.GetMinKey());
-                redBlack.RemoveMin();
-                Console.WriteLine(@"Remove Max Key:" + redBlack.GetMaxKey());
-                redBlack.RemoveMax();
+                Console.WriteLine(@"Remove Min Key:" + RedBlackTree.GetMinKey());
+                RedBlackTree.RemoveMin();
+                Console.WriteLine(@"Remove Max Key:" + RedBlackTree.GetMaxKey());
+                RedBlackTree.RemoveMax();
 
                 Console.WriteLine(Environment.NewLine);
 
                 Console.WriteLine(@"** Clearing Tree **");
-                redBlack.Clear();
+                RedBlackTree.Clear();
                 Console.WriteLine(Environment.NewLine);
 
                 Console.WriteLine(@"Press enter to terminate");
@@ -111,10 +111,10 @@ namespace Test
         public static void DumpMinMaxValue()
         {
             Console.WriteLine(@"** Dumping Min/Max Values  **");
-            Console.WriteLine(@"Min MyObj value: " + redBlack.GetMinValue().Data);
-            Console.WriteLine(@"Max MyObj value: " + redBlack.GetMaxValue().Data);
-            Console.WriteLine(@"Min MyObj key: " + redBlack.GetMinKey());
-            Console.WriteLine(@"Max MyObj key: " + redBlack.GetMaxKey());
+            Console.WriteLine(@"Min MyObj value: " + RedBlackTree.GetMinValue().Data);
+            Console.WriteLine(@"Max MyObj value: " + RedBlackTree.GetMaxValue().Data);
+            Console.WriteLine(@"Min MyObj key: " + RedBlackTree.GetMinKey());
+            Console.WriteLine(@"Max MyObj key: " + RedBlackTree.GetMaxKey());
         }
     }
 }

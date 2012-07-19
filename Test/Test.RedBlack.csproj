@@ -109,9 +109,6 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="MyKey.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="MyObj.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -137,13 +134,13 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\System.Collections.Generic.RedBlack.csproj">
+    <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RedBlackTree\System.Collections.Generic.RedBlack.csproj">
       <Project>{C2816E8D-4CF0-4A84-9EC9-E8B30A0DF1C0}</Project>
       <Name>System.Collections.Generic.RedBlack</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
