@@ -100,40 +100,15 @@ namespace System.Collections.Generic.RedBlack
         ///</summary>
         public void Add(T data)
         {
-            if (data == null)
-                throw (new RedBlackException(Properties.Resources.ExceptionNodeKeyAndDataMustNotBeNull));
+            New(data);
+        }
 
-            // traverse tree - find where node belongs
-            // create new node
-            RedBlackNode<T> _newNode = new RedBlackNode<T>(data);
-            RedBlackNode<T> _workNode = _treeBaseNode; // grab the rbTree node of the tree
-
-            while (_workNode != SentinelNode)
+        public void Add(IEnumerable<T> items)
+        {
+            foreach (T item in items)
             {
-                // find Parent
-                _newNode.Parent = _workNode;
-                int result = data.CompareTo(_workNode.Data);
-                if (result == 0)
-                    throw (new RedBlackException(Properties.Resources.ExceptionNodeWithSameKeyAlreadyExists));
-                _workNode = result > 0 ? _workNode.Right : _workNode.Left;
+                New(item);
             }
-
-            // insert node into tree starting at parent's location
-            if (_newNode.Parent != null)
-            {
-                if (_newNode.Data.CompareTo(_newNode.Parent.Data) > 0)
-                    _newNode.Parent.Right = _newNode;
-                else
-                    _newNode.Parent.Left = _newNode;
-            }
-            else
-                _treeBaseNode = _newNode; // first node added
-
-            BalanceTreeAfterInsert(_newNode); // restore red-black properties
-
-            _lastNodeFound = _newNode;
-
-            Count++;
         }
 
         ///<summary>
@@ -209,23 +184,7 @@ namespace System.Collections.Generic.RedBlack
         ///</summary>
         public IEnumerator<T> GetEnumerator()
         {
-            Stack<T> stack = GetAll();
-
-            return stack.GetEnumerator();
-        }
-
-        private Stack<T> GetAll()
-        {
-            Stack<T> stack = new Stack<T>();
-
-            // use depth-first traversal to push nodes into stack
-            // the lowest node will be at the top of the stack
-
-            if (_treeBaseNode != SentinelNode)
-            {
-                WalkNextLevel(_treeBaseNode, stack);
-            }
-            return stack;
+            return GetAll().GetEnumerator();
         }
 
         ///<summary>
@@ -252,8 +211,6 @@ namespace System.Collections.Generic.RedBlack
 
             if (node != SentinelNode)
                 Delete(node);
-
-            Count = Count - 1;
         }
 
         ///<summary>
@@ -355,9 +312,16 @@ namespace System.Collections.Generic.RedBlack
             return _intHashCode;
         }
 
+        /// <summary>
+        /// Returns an enumerator that iterates through a collection.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="T:System.Collections.IEnumerator"/> object that can be used to iterate through the collection.
+        /// </returns>
+        /// <filterpriority>2</filterpriority>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return GetEnumerator();
+            return GetAll().GetEnumerator();
         }
 
         ///<summary>
@@ -369,6 +333,44 @@ namespace System.Collections.Generic.RedBlack
         }
 
         #region "Private Methods"
+
+        private void New(T data)
+        {
+            if (data == null)
+                throw (new RedBlackException(Properties.Resources.ExceptionNodeKeyAndDataMustNotBeNull));
+
+            // traverse tree - find where node belongs
+            // create new node
+            RedBlackNode<T> _newNode = new RedBlackNode<T>(data);
+            RedBlackNode<T> _workNode = _treeBaseNode; // grab the rbTree node of the tree
+
+            while (_workNode != SentinelNode)
+            {
+                // find Parent
+                _newNode.Parent = _workNode;
+                int result = data.CompareTo(_workNode.Data);
+                if (result == 0)
+                    throw (new RedBlackException(Properties.Resources.ExceptionNodeWithSameKeyAlreadyExists));
+                _workNode = result > 0 ? _workNode.Right : _workNode.Left;
+            }
+
+            // insert node into tree starting at parent's location
+            if (_newNode.Parent != null)
+            {
+                if (_newNode.Data.CompareTo(_newNode.Parent.Data) > 0)
+                    _newNode.Parent.Right = _newNode;
+                else
+                    _newNode.Parent.Left = _newNode;
+            }
+            else
+                _treeBaseNode = _newNode; // first node added
+
+            BalanceTreeAfterInsert(_newNode); // restore red-black properties
+
+            _lastNodeFound = _newNode;
+
+            Count++;
+        }
 
         ///<summary>
         /// Delete
@@ -427,6 +429,8 @@ namespace System.Collections.Generic.RedBlack
                 BalanceTreeAfterDelete(x);
 
             _lastNodeFound = SentinelNode;
+
+            Count--;
         }
 
         ///<summary>
@@ -508,6 +512,20 @@ namespace System.Collections.Generic.RedBlack
                 }
             }
             node.Color = RedBlackNodeType.Black;
+        }
+
+        private Stack<T> GetAll()
+        {
+            Stack<T> stack = new Stack<T>();
+
+            // use depth-first traversal to push nodes into stack
+            // the lowest node will be at the top of the stack
+
+            if (_treeBaseNode != SentinelNode)
+            {
+                WalkNextLevel(_treeBaseNode, stack);
+            }
+            return stack;
         }
 
         private static void WalkNextLevel(RedBlackNode<T> node, Stack<T> stack)

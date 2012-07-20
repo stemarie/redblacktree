@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic.RedBlack;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -213,20 +214,27 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for GetEnumerator
         ///</summary>
-        public void GetEnumeratorTestHelper<T>(IEnumerator<T> enumerator)
+        public void GetEnumeratorTestHelper<T>(T[] items)
             where T : class , IComparable
         {
             RedBlackTree<T> target = new RedBlackTree<T>();
-            IEnumerator<T> expected = enumerator;
-            target.Add(enumerator.Current);
-            IEnumerator<T> actual = target.GetEnumerator();
-            Assert.AreEqual(expected, actual);
+            foreach (T item in items)
+            {
+                target.Add(item);
+            }
+            List<T> list = new List<T>(target);
+            Assert.AreEqual(3, list.Count);
         }
 
-        [TestMethod, Ignore]
+        [TestMethod]
         public void GetEnumeratorTest()
         {
-            GetEnumeratorTestHelper((IEnumerator<GenericParameterHelper>)(new[] { new GenericParameterHelper(5) }).GetEnumerator());
+            GetEnumeratorTestHelper(new[]
+                                        {
+                                            new GenericParameterHelper(5),
+                                            new GenericParameterHelper(6),
+                                            new GenericParameterHelper(7)
+                                        });
         }
 
         /// <summary>

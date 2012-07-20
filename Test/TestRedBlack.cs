@@ -73,7 +73,7 @@ namespace Test
                 RedBlackTree.RemoveMin();
                 Console.WriteLine(@"Remove Max Key:" + RedBlackTree.GetMaxKey());
                 RedBlackTree.RemoveMax();
-
+                
                 Console.WriteLine(Environment.NewLine);
 
                 Console.WriteLine(@"** Clearing Tree **");
