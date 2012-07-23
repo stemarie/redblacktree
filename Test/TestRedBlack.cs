@@ -6,7 +6,7 @@ namespace Test
 {
     sealed class TestRedBlack
     {
-        static readonly RedBlackTree<MyObj> RedBlackTree = new RedBlackTree<MyObj>();
+        static readonly RedBlackTree<string, MyObj> RedBlackTree = new RedBlackTree<string, MyObj>();
 
         static public void Main()
         {
@@ -28,19 +28,19 @@ namespace Test
             try
             {
                 // format: Add(key, value)
-                RedBlackTree.Add(obj1);
-                RedBlackTree.Add(obj2);
-                RedBlackTree.Add(obj3);
-                RedBlackTree.Add(obj4);
-                RedBlackTree.Add(obj5);
-                RedBlackTree.Add(obj6);
-                RedBlackTree.Add(obj7);
-                RedBlackTree.Add(obj8);
-                RedBlackTree.Add(obj9);
-                RedBlackTree.Add(obj10);
-                RedBlackTree.Add(obj11);
-                RedBlackTree.Add(obj12);
-                RedBlackTree.Add(obj13);
+                RedBlackTree.Add(obj1.Data, obj1);
+                RedBlackTree.Add(obj2.Data, obj2);
+                RedBlackTree.Add(obj3.Data, obj3);
+                RedBlackTree.Add(obj4.Data, obj4);
+                RedBlackTree.Add(obj5.Data, obj5);
+                RedBlackTree.Add(obj6.Data, obj6);
+                RedBlackTree.Add(obj7.Data, obj7);
+                RedBlackTree.Add(obj8.Data, obj8);
+                RedBlackTree.Add(obj9.Data, obj9);
+                RedBlackTree.Add(obj10.Data, obj10);
+                RedBlackTree.Add(obj11.Data, obj11);
+                RedBlackTree.Add(obj12.Data, obj12);
+                RedBlackTree.Add(obj13.Data, obj13);
 
                 Console.WriteLine(Environment.NewLine);
 
@@ -53,7 +53,7 @@ namespace Test
                 DumpMinMaxValue();
                 Console.WriteLine(Environment.NewLine);
 
-                IComparable tObjKey = RedBlackTree.GetMinKey();
+                string tObjKey = RedBlackTree.GetMinKey();
                 MyObj tObj = RedBlackTree.GetData(tObjKey);
                 Console.WriteLine(@"Remove Min Key: " + tObj.Data);
                 Console.WriteLine(Environment.NewLine);

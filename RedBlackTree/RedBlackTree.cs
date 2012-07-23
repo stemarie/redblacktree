@@ -5,10 +5,13 @@
 // 3. Red nodes can only have black children. 
 // 4. All paths from a node to its leaves contain the same number of black nodes.
 
+using System.Linq;
+
 namespace System.Collections.Generic.RedBlack
 {
-    public class RedBlackTree<T> : ICollection<T>
-        where T : class, IComparable
+    public class RedBlackTree<K, T> : IDictionary<K, T>
+        where T : class
+        where K : IComparable
     {
         public enum RedBlackNodeType
         {
@@ -25,18 +28,18 @@ namespace System.Collections.Generic.RedBlack
         private string _strIdentifier;
 
         // the tree
-        private RedBlackNode<T> _treeBaseNode = SentinelNode;
+        private RedBlackNode<K, T> _treeBaseNode = SentinelNode;
 
         // the node that was last found; used to optimize searches
-        private RedBlackNode<T> _lastNodeFound = SentinelNode;
+        private RedBlackNode<K, T> _lastNodeFound = SentinelNode;
 
         private readonly Random _rand = new Random();
 
         // sentinelNode is convenient way of indicating a leaf node.
         // set up the sentinel node. the sentinel node is the key to a successfull
         // implementation and for understanding the red-black tree properties.
-        internal static readonly RedBlackNode<T> SentinelNode =
-            new RedBlackNode<T>
+        internal static readonly RedBlackNode<K, T> SentinelNode =
+            new RedBlackNode<K, T>
             {
                 Left = null,
                 Right = null,
@@ -49,12 +52,7 @@ namespace System.Collections.Generic.RedBlack
             Initialize(base.ToString() + _rand.Next());
         }
 
-        public RedBlackTree(string strIdentifier)
-        {
-            Initialize(strIdentifier);
-        }
-
-        public T this[IComparable key]
+        public T this[K key]
         {
             get { return GetNode(key).Data; }
             set { GetNode(key).Data = value; }
@@ -67,17 +65,9 @@ namespace System.Collections.Generic.RedBlack
         /// true if <paramref name="item"/> was successfully removed from the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, false. This method also returns false if <paramref name="item"/> is not found in the original <see cref="T:System.Collections.Generic.ICollection`1"/>.
         /// </returns>
         /// <param name="item">The object to remove from the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.</exception>
-        public bool Remove(T item)
+        public bool Remove(KeyValuePair<K, T> item)
         {
-            try
-            {
-                Delete(GetNode(item));
-                return true;
-            }
-            catch (RedBlackException)
-            {
-                return false;
-            }
+            return Remove(item.Key);
         }
 
         public int Count { get; private set; }
@@ -94,28 +84,10 @@ namespace System.Collections.Generic.RedBlack
         }
 
         ///<summary>
-        /// Add
-        /// args: ByVal key As IComparable, ByVal data As T
-        /// key is object that implements IComparable interface
-        ///</summary>
-        public void Add(T data)
-        {
-            New(data);
-        }
-
-        public void Add(IEnumerable<T> items)
-        {
-            foreach (T item in items)
-            {
-                New(item);
-            }
-        }
-
-        ///<summary>
         /// GetData
         /// Gets the data object associated with the specified key
         ///</summary>
-        public T GetData(IComparable key)
+        public T GetData(K key)
         {
             return GetNode(key).Data;
         }
@@ -124,9 +96,9 @@ namespace System.Collections.Generic.RedBlack
         /// GetMinKey
         /// Returns the minimum key value
         ///</summary>
-        public IComparable GetMinKey()
+        public K GetMinKey()
         {
-            RedBlackNode<T> _workNode = _treeBaseNode;
+            RedBlackNode<K, T> _workNode = _treeBaseNode;
 
             if (_workNode == null || _workNode == SentinelNode)
                 throw (new RedBlackException(Properties.Resources.ExceptionTreeIsEmpty));
@@ -137,16 +109,16 @@ namespace System.Collections.Generic.RedBlack
 
             _lastNodeFound = _workNode;
 
-            return _workNode.Data;
+            return _workNode.Key;
         }
 
         ///<summary>
         /// GetMaxKey
         /// Returns the maximum key value
         ///</summary>
-        public IComparable GetMaxKey()
+        public K GetMaxKey()
         {
-            RedBlackNode<T> _workNode = _treeBaseNode;
+            RedBlackNode<K, T> _workNode = _treeBaseNode;
 
             if (_workNode == null || _workNode == SentinelNode)
                 throw (new RedBlackException(Properties.Resources.ExceptionTreeIsEmpty));
@@ -157,7 +129,7 @@ namespace System.Collections.Generic.RedBlack
 
             _lastNodeFound = _workNode;
 
-            return _workNode.Data;
+            return _workNode.Key;
         }
 
         ///<summary>
@@ -184,7 +156,7 @@ namespace System.Collections.Generic.RedBlack
         ///</summary>
         public IEnumerator<T> GetEnumerator()
         {
-            return GetAll().GetEnumerator();
+            return GetAll().Select(i => i.Data).GetEnumerator();
         }
 
         ///<summary>
@@ -194,23 +166,6 @@ namespace System.Collections.Generic.RedBlack
         public bool IsEmpty()
         {
             return (_treeBaseNode == SentinelNode);
-        }
-
-        ///<summary>
-        /// Remove
-        /// removes the key and data object (delete)
-        ///</summary>
-        public void Remove(IComparable key)
-        {
-            if (key == null)
-                throw (new RedBlackException(Properties.Resources.ExceptionNodeKeyIsNull));
-
-            // find node
-
-            RedBlackNode<T> node = GetNode(key);
-
-            if (node != SentinelNode)
-                Delete(node);
         }
 
         ///<summary>
@@ -237,6 +192,15 @@ namespace System.Collections.Generic.RedBlack
             Delete(GetNode(GetMaxKey()));
         }
 
+        /// <summary>
+        /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+        /// </summary>
+        /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.</exception>
+        public void Add(KeyValuePair<K, T> item)
+        {
+            New(item.Key, item.Value);
+        }
+
         ///<summary>
         /// Clear
         /// Empties or clears the tree
@@ -254,27 +218,16 @@ namespace System.Collections.Generic.RedBlack
         /// true if <paramref name="item"/> is found in the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, false.
         /// </returns>
         /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
-        public bool Contains(T item)
+        public bool Contains(KeyValuePair<K, T> item)
         {
-            try
-            {
-                return GetData(item) != null;
-            }
-            catch (RedBlackException)
-            {
-                return false;
-            }
+            return ContainsKey(item.Key);
         }
 
         /// <summary>
         /// Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1"/> to an <see cref="T:System.Array"/>, starting at a particular <see cref="T:System.Array"/> index.
         /// </summary>
-        /// <param name="array">The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1"/>. The <see cref="T:System.Array"/> must have zero-based indexing.</param>
-        /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
-        /// <exception cref="T:System.ArgumentNullException"><paramref name="array"/> is null.</exception>
-        /// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="arrayIndex"/> is less than 0.</exception>
-        /// <exception cref="T:System.ArgumentException"><paramref name="array"/> is multidimensional.-or-The number of elements in the source <see cref="T:System.Collections.Generic.ICollection`1"/> is greater than the available space from <paramref name="arrayIndex"/> to the end of the destination <paramref name="array"/>.-or-Type <paramref name="T"/> cannot be cast automatically to the type of the destination <paramref name="array"/>.</exception>
-        public void CopyTo(T[] array, int arrayIndex)
+        /// <param name="array">The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1"/>. The <see cref="T:System.Array"/> must have zero-based indexing.</param><param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param><exception cref="T:System.ArgumentNullException"><paramref name="array"/> is null.</exception><exception cref="T:System.ArgumentOutOfRangeException"><paramref name="arrayIndex"/> is less than 0.</exception><exception cref="T:System.ArgumentException"><paramref name="array"/> is multidimensional.-or-The number of elements in the source <see cref="T:System.Collections.Generic.ICollection`1"/> is greater than the available space from <paramref name="arrayIndex"/> to the end of the destination <paramref name="array"/>.-or-Type <paramref name="T"/> cannot be cast automatically to the type of the destination <paramref name="array"/>.</exception>
+        public void CopyTo(KeyValuePair<K, T>[] array, int arrayIndex)
         {
             if (arrayIndex < 0)
                 throw new ArgumentOutOfRangeException();
@@ -283,11 +236,24 @@ namespace System.Collections.Generic.RedBlack
             if ((array.Length - arrayIndex) < Count)
                 throw new ArgumentException();
             int _currentPosition = arrayIndex;
-            foreach (T item in GetAll())
+            foreach (KeyValuePair<K, T> item in GetAll()
+                .Select(i => new KeyValuePair<K, T>(i.Key, i.Data)))
             {
                 array[_currentPosition] = item;
                 _currentPosition++;
             }
+        }
+
+        /// <summary>
+        /// Determines whether the <see cref="T:System.Collections.Generic.ICollection`1"/> contains a specific value.
+        /// </summary>
+        /// <returns>
+        /// true if <paramref name="item"/> is found in the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, false.
+        /// </returns>
+        /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
+        public bool Contains(T item)
+        {
+            return GetAll().Select(i => i.Data).Any(i => i == item);
         }
 
         ///<summary>
@@ -298,7 +264,7 @@ namespace System.Collections.Generic.RedBlack
             if (obj == null)
                 return false;
 
-            if (!(obj is RedBlackNode<T>))
+            if (!(obj is RedBlackNode<K, T>))
                 return false;
 
             return this == obj || (ToString().Equals(obj.ToString()));
@@ -324,6 +290,19 @@ namespace System.Collections.Generic.RedBlack
             return GetAll().GetEnumerator();
         }
 
+        /// <summary>
+        /// Returns an enumerator that iterates through the collection.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="T:System.Collections.Generic.IEnumerator`1"/> that can be used to iterate through the collection.
+        /// </returns>
+        /// <filterpriority>1</filterpriority>
+        IEnumerator<KeyValuePair<K, T>> IEnumerable<KeyValuePair<K, T>>.GetEnumerator()
+        {
+            return GetAll().Select(i => new KeyValuePair<K, T>(i.Key, i.Data))
+                .GetEnumerator();
+        }
+
         ///<summary>
         /// ToString
         ///</summary>
@@ -334,21 +313,21 @@ namespace System.Collections.Generic.RedBlack
 
         #region "Private Methods"
 
-        private void New(T data)
+        private void New(K key, T data)
         {
             if (data == null)
                 throw (new RedBlackException(Properties.Resources.ExceptionNodeKeyAndDataMustNotBeNull));
 
             // traverse tree - find where node belongs
             // create new node
-            RedBlackNode<T> _newNode = new RedBlackNode<T>(data);
-            RedBlackNode<T> _workNode = _treeBaseNode; // grab the rbTree node of the tree
+            RedBlackNode<K, T> _newNode = new RedBlackNode<K, T>(key, data);
+            RedBlackNode<K, T> _workNode = _treeBaseNode; // grab the rbTree node of the tree
 
             while (_workNode != SentinelNode)
             {
                 // find Parent
                 _newNode.Parent = _workNode;
-                int result = data.CompareTo(_workNode.Data);
+                int result = key.CompareTo(_workNode.Key);
                 if (result == 0)
                     throw (new RedBlackException(Properties.Resources.ExceptionNodeWithSameKeyAlreadyExists));
                 _workNode = result > 0 ? _workNode.Right : _workNode.Left;
@@ -357,7 +336,7 @@ namespace System.Collections.Generic.RedBlack
             // insert node into tree starting at parent's location
             if (_newNode.Parent != null)
             {
-                if (_newNode.Data.CompareTo(_newNode.Parent.Data) > 0)
+                if (_newNode.Key.CompareTo(_newNode.Parent.Key) > 0)
                     _newNode.Parent.Right = _newNode;
                 else
                     _newNode.Parent.Left = _newNode;
@@ -376,7 +355,7 @@ namespace System.Collections.Generic.RedBlack
         /// Delete
         /// Delete a node from the tree and restore red black properties
         ///</summary>
-        private void Delete(RedBlackNode<T> node)
+        private void Delete(RedBlackNode<K, T> node)
         {
             // A node to be deleted will be: 
             //		1. a leaf with no children
@@ -385,48 +364,51 @@ namespace System.Collections.Generic.RedBlack
             // If the deleted node is red, the red black properties still hold.
             // If the deleted node is black, the tree needs rebalancing
 
-            RedBlackNode<T> _workNode;					// work node 
+            RedBlackNode<K, T> _replacementNode;					// work node 
 
             // find the replacement node (the successor to x) - the node one with 
             // at *most* one child. 
             if (node.Left == SentinelNode || node.Right == SentinelNode)
-                _workNode = node;						// node has sentinel as a child
+                _replacementNode = node;						// node has sentinel as a child
             else
             {
                 // z has two children, find replacement node which will 
                 // be the leftmost node greater than z
-                _workNode = node.Right;				        // traverse right subtree	
-                while (_workNode.Left != SentinelNode)		// to find next node in sequence
-                    _workNode = _workNode.Left;
+                _replacementNode = node.Right;				        // traverse right subtree	
+                while (_replacementNode.Left != SentinelNode)		// to find next node in sequence
+                    _replacementNode = _replacementNode.Left;
             }
 
             // at this point, y contains the replacement node. it's content will be copied 
             // to the valules in the node to be deleted
 
             // x (y's only child) is the node that will be linked to y's old parent. 
-            RedBlackNode<T> x = _workNode.Left != SentinelNode ? _workNode.Left : _workNode.Right;
+            RedBlackNode<K, T> _linkedNode = _replacementNode.Left != SentinelNode
+                                                 ? _replacementNode.Left
+                                                 : _replacementNode.Right;
 
             // replace x's parent with y's parent and
             // link x to proper subtree in parent
             // this removes y from the chain
-            x.Parent = _workNode.Parent;
-            if (_workNode.Parent != null)
-                if (_workNode == _workNode.Parent.Left)
-                    _workNode.Parent.Left = x;
+            _linkedNode.Parent = _replacementNode.Parent;
+            if (_replacementNode.Parent != null)
+                if (_replacementNode == _replacementNode.Parent.Left)
+                    _replacementNode.Parent.Left = _linkedNode;
                 else
-                    _workNode.Parent.Right = x;
+                    _replacementNode.Parent.Right = _linkedNode;
             else
-                _treeBaseNode = x;			// make x the root node
+                _treeBaseNode = _linkedNode;			// make x the root node
 
             // copy the values from y (the replacement node) to the node being deleted.
             // note: this effectively deletes the node. 
-            if (_workNode != node)
+            if (_replacementNode != node)
             {
-                node.Data = _workNode.Data;
+                node.Key = _replacementNode.Key;
+                node.Data = _replacementNode.Data;
             }
 
-            if (_workNode.Color == RedBlackNodeType.Black)
-                BalanceTreeAfterDelete(x);
+            if (_replacementNode.Color == RedBlackNodeType.Black)
+                BalanceTreeAfterDelete(_linkedNode);
 
             _lastNodeFound = SentinelNode;
 
@@ -439,13 +421,12 @@ namespace System.Collections.Generic.RedBlack
         /// properties. Examine the tree and restore. Rotations are normally 
         /// required to restore it
         ///</summary>
-        private void BalanceTreeAfterDelete(RedBlackNode<T> node)
+        private void BalanceTreeAfterDelete(RedBlackNode<K, T> node)
         {
-            // maintain Red-Black tree balance after deleting node 			
-
+            // maintain Red-Black tree balance after deleting node
             while (node != _treeBaseNode && node.Color == RedBlackNodeType.Black)
             {
-                RedBlackNode<T> _workNode;
+                RedBlackNode<K, T> _workNode;
                 if (node == node.Parent.Left)			// determine sub tree from parent
                 {
                     _workNode = node.Parent.Right;			// y is x's sibling 
@@ -514,9 +495,9 @@ namespace System.Collections.Generic.RedBlack
             node.Color = RedBlackNodeType.Black;
         }
 
-        private Stack<T> GetAll()
+        private Stack<RedBlackNode<K, T>> GetAll()
         {
-            Stack<T> stack = new Stack<T>();
+            Stack<RedBlackNode<K, T>> stack = new Stack<RedBlackNode<K, T>>();
 
             // use depth-first traversal to push nodes into stack
             // the lowest node will be at the top of the stack
@@ -528,31 +509,31 @@ namespace System.Collections.Generic.RedBlack
             return stack;
         }
 
-        private static void WalkNextLevel(RedBlackNode<T> node, Stack<T> stack)
+        private static void WalkNextLevel(RedBlackNode<K, T> node, Stack<RedBlackNode<K, T>> stack)
         {
             if (node.Right != SentinelNode)
                 WalkNextLevel(node.Right, stack);
-            stack.Push(node.Data);
+            stack.Push(node);
             if (node.Left != SentinelNode)
                 WalkNextLevel(node.Left, stack);
         }
 
-        private RedBlackNode<T> GetNode(IComparable key)
+        private RedBlackNode<K, T> GetNode(K key)
         {
             int result;
             if (_lastNodeFound != SentinelNode)
             {
-                result = key.CompareTo(_lastNodeFound.Data);
+                result = key.CompareTo(_lastNodeFound.Key);
                 if (result == 0)
                     return _lastNodeFound;
             }
 
-            RedBlackNode<T> treeNode = _treeBaseNode; // begin at root
+            RedBlackNode<K, T> treeNode = _treeBaseNode; // begin at root
 
             // traverse tree until node is found
             while (treeNode != SentinelNode)
             {
-                result = key.CompareTo(treeNode.Data);
+                result = key.CompareTo(treeNode.Key);
                 if (result == 0)
                 {
                     _lastNodeFound = treeNode;
@@ -560,20 +541,20 @@ namespace System.Collections.Generic.RedBlack
                 }
                 treeNode = result < 0 ? treeNode.Left : treeNode.Right;
             }
-            throw (new RedBlackException(Properties.Resources.ExceptionNodeKeyWasNotFound));
+            return null;
         }
 
         ///<summary>
         /// RotateRight
         /// Rebalance the tree by rotating the nodes to the right
         ///</summary>
-        private void RotateRight(RedBlackNode<T> node)
+        private void RotateRight(RedBlackNode<K, T> node)
         {
             // pushing node x down and to the Right to balance the tree. x's Left child (y)
             // replaces x (since x < y), and y's Right child becomes x's Left child 
             // (since it's < x but > y).
 
-            RedBlackNode<T> _workNode = node.Left;			// get x's Left node, this becomes y
+            RedBlackNode<K, T> _workNode = node.Left;			// get x's Left node, this becomes y
 
             // set x's Right link
             node.Left = _workNode.Right;					// y's Right child becomes x's Left child
@@ -605,13 +586,13 @@ namespace System.Collections.Generic.RedBlack
         /// RotateLeft
         /// Rebalance the tree by rotating the nodes to the left
         ///</summary>
-        private void RotateLeft(RedBlackNode<T> node)
+        private void RotateLeft(RedBlackNode<K, T> node)
         {
             // pushing node x down and to the Left to balance the tree. x's Right child (y)
             // replaces x (since y > x), and y's Left child becomes x's Right child 
             // (since it's < y but > x).
 
-            RedBlackNode<T> _workNode = node.Right;			// get x's Right node, this becomes y
+            RedBlackNode<K, T> _workNode = node.Right;			// get x's Right node, this becomes y
 
             // set x's Right link
             node.Right = _workNode.Left;					// y's Left child's becomes x's Right child
@@ -651,7 +632,7 @@ namespace System.Collections.Generic.RedBlack
         /// properties. Examine the tree and restore. Rotations are normally 
         /// required to restore it
         ///</summary>
-        private void BalanceTreeAfterInsert(RedBlackNode<T> node)
+        private void BalanceTreeAfterInsert(RedBlackNode<K, T> node)
         {
             // x and y are used as variable names for brevity, in a more formal
             // implementation, you should probably change the names
@@ -660,7 +641,7 @@ namespace System.Collections.Generic.RedBlack
             while (node != _treeBaseNode && node.Parent.Color == RedBlackNodeType.Red)
             {
                 // Parent node is .Colored red; 
-                RedBlackNode<T> workNode;
+                RedBlackNode<K, T> workNode;
                 if (node.Parent == node.Parent.Parent.Left)	// determine traversal path			
                 {										// is it on the Left or Right subtree?
                     workNode = node.Parent.Parent.Right;			// get uncle
@@ -717,5 +698,101 @@ namespace System.Collections.Generic.RedBlack
 
         #endregion
 
+        /// <summary>
+        /// Determines whether the <see cref="T:System.Collections.Generic.IDictionary`2"/> contains an element with the specified key.
+        /// </summary>
+        /// <returns>
+        /// true if the <see cref="T:System.Collections.Generic.IDictionary`2"/> contains an element with the key; otherwise, false.
+        /// </returns>
+        /// <param name="key">The key to locate in the <see cref="T:System.Collections.Generic.IDictionary`2"/>.</param><exception cref="T:System.ArgumentNullException"><paramref name="key"/> is null.</exception>
+        public bool ContainsKey(K key)
+        {
+            try
+            {
+                var node = GetNode(key);
+                return true;
+            }
+            catch (RedBlackException)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Adds an element with the provided key and value to the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+        /// </summary>
+        /// <param name="key">The object to use as the key of the element to add.</param><param name="value">The object to use as the value of the element to add.</param><exception cref="T:System.ArgumentNullException"><paramref name="key"/> is null.</exception><exception cref="T:System.ArgumentException">An element with the same key already exists in the <see cref="T:System.Collections.Generic.IDictionary`2"/>.</exception><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.IDictionary`2"/> is read-only.</exception>
+        public void Add(K key, T value)
+        {
+            New(key, value);
+        }
+
+        /// <summary>
+        /// Removes the element with the specified key from the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+        /// </summary>
+        /// <returns>
+        /// true if the element is successfully removed; otherwise, false.  This method also returns false if <paramref name="key"/> was not found in the original <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+        /// </returns>
+        /// <param name="key">The key of the element to remove.</param><exception cref="T:System.ArgumentNullException"><paramref name="key"/> is null.</exception><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.IDictionary`2"/> is read-only.</exception>
+        public bool Remove(K key)
+        {
+            try
+            {
+                Delete(GetNode(key));
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the value associated with the specified key.
+        /// </summary>
+        /// <returns>
+        /// true if the object that implements <see cref="T:System.Collections.Generic.IDictionary`2"/> contains an element with the specified key; otherwise, false.
+        /// </returns>
+        /// <param name="key">The key whose value to get.</param><param name="value">When this method returns, the value associated with the specified key, if the key is found; otherwise, the default value for the type of the <paramref name="value"/> parameter. This parameter is passed uninitialized.</param><exception cref="T:System.ArgumentNullException"><paramref name="key"/> is null.</exception>
+        public bool TryGetValue(K key, out T value)
+        {
+            value = GetNode(key).Data;
+            return (value != null);
+        }
+
+        /// <summary>
+        /// Gets or sets the element with the specified key.
+        /// </summary>
+        /// <returns>
+        /// The element with the specified key.
+        /// </returns>
+        /// <param name="key">The key of the element to get or set.</param><exception cref="T:System.ArgumentNullException"><paramref name="key"/> is null.</exception><exception cref="T:System.Collections.Generic.KeyNotFoundException">The property is retrieved and <paramref name="key"/> is not found.</exception><exception cref="T:System.NotSupportedException">The property is set and the <see cref="T:System.Collections.Generic.IDictionary`2"/> is read-only.</exception>
+        T IDictionary<K, T>.this[K key]
+        {
+            get { return GetNode(key).Data; }
+            set { GetNode(key).Data = value; }
+        }
+
+        /// <summary>
+        /// Gets an <see cref="T:System.Collections.Generic.ICollection`1"/> containing the keys of the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="T:System.Collections.Generic.ICollection`1"/> containing the keys of the object that implements <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+        /// </returns>
+        public ICollection<K> Keys
+        {
+            get { return GetAll().Select(i => i.Key).ToArray(); }
+        }
+
+        /// <summary>
+        /// Gets an <see cref="T:System.Collections.Generic.ICollection`1"/> containing the values in the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="T:System.Collections.Generic.ICollection`1"/> containing the values in the object that implements <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+        /// </returns>
+        public ICollection<T> Values
+        {
+            get { return GetAll().Select(i => i.Data).ToArray(); }
+        }
     }
 }

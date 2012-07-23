@@ -65,27 +65,11 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for RedBlackTree`1 Constructor
         ///</summary>
-        public void RedBlackTreeConstructorTestHelper<T>()
-            where T : class , IComparable
+        public void RedBlackTreeConstructorTest1Helper<K, T>()
+            where T : class
+            where K : IComparable
         {
-            const string strIdentifier = "identifier"; // TODO: Initialize to an appropriate value
-            RedBlackTree<T> target = new RedBlackTree<T>(strIdentifier);
-            Assert.AreEqual(strIdentifier, target.ToString(), "Identifiers are not equal");
-        }
-
-        [TestMethod]
-        public void RedBlackTreeConstructorTest()
-        {
-            RedBlackTreeConstructorTestHelper<GenericParameterHelper>();
-        }
-
-        /// <summary>
-        ///A test for RedBlackTree`1 Constructor
-        ///</summary>
-        public void RedBlackTreeConstructorTest1Helper<T>()
-            where T : class , IComparable
-        {
-            RedBlackTree<T> target = new RedBlackTree<T>();
+            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
             Assert.IsTrue(target.IsEmpty());
             Assert.AreEqual(0, target.Count);
         }
@@ -93,37 +77,40 @@ namespace TestProject.RedBlackTree
         [TestMethod]
         public void RedBlackTreeConstructorTest1()
         {
-            RedBlackTreeConstructorTest1Helper<GenericParameterHelper>();
+            RedBlackTreeConstructorTest1Helper<int, GenericParameterHelper>();
         }
 
         /// <summary>
         ///A test for Add
         ///</summary>
-        public void AddTestHelper<T>(T x)
-            where T : class , IComparable
+        public void AddTestHelper<K, T>(K key, T x)
+            where T : class
+            where K : IComparable
         {
-            RedBlackTree<T> target = new RedBlackTree<T>(); // TODO: Initialize to an appropriate value
-            T data = x; // TODO: Initialize to an appropriate value
-            target.Add(data);
+            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
+            T data = x;
+            target.Add(key, data);
             Assert.AreEqual(x, data, "Objects are not the same");
         }
 
         [TestMethod]
         public void AddTest()
         {
-            AddTestHelper(new GenericParameterHelper(5));
+            AddTestHelper(5, new GenericParameterHelper(5));
         }
 
         /// <summary>
         ///A test for Clear
         ///</summary>
+        ///<param name="key"> </param>
         ///<param name="testItem"> </param>
-        public void ClearTestHelper<T>(T testItem)
-            where T : class , IComparable
+        public void ClearTestHelper<K, T>(K key, T testItem)
+            where T : class
+            where K : IComparable
         {
-            RedBlackTree<T> target = new RedBlackTree<T>(); // TODO: Initialize to an appropriate value
+            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
             Assert.IsTrue(target.IsEmpty());
-            target.Add(testItem);
+            target.Add(key, testItem);
             Assert.AreEqual(1, target.Count);
             target.Clear();
             Assert.IsTrue(target.IsEmpty());
@@ -132,16 +119,17 @@ namespace TestProject.RedBlackTree
         [TestMethod]
         public void ClearTest()
         {
-            ClearTestHelper(new GenericParameterHelper(5));
+            ClearTestHelper(5, new GenericParameterHelper(5));
         }
 
         /// <summary>
         ///A test for Contains
         ///</summary>
-        public void ContainsTestHelper<T>(T testItem)
-            where T : class , IComparable
+        public void ContainsTestHelper<K, T>(K key, T testItem)
+            where T : class
+            where K : IComparable
         {
-            RedBlackTree<T> target = new RedBlackTree<T>();
+            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
             T item = testItem;
             const bool expected = false;
             bool actual = target.Contains(item);
@@ -151,17 +139,18 @@ namespace TestProject.RedBlackTree
         [TestMethod]
         public void ContainsTest()
         {
-            ContainsTestHelper(new GenericParameterHelper(5));
+            ContainsTestHelper(5, new GenericParameterHelper(5));
         }
 
         /// <summary>
         ///A test for CopyTo
         ///</summary>
-        public void CopyToTestHelper<T>()
-            where T : class , IComparable
+        public void CopyToTestHelper<K, T>()
+            where T : class
+            where K : IComparable
         {
-            RedBlackTree<T> target = new RedBlackTree<T>();
-            T[] array = new T[1];
+            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
+            KeyValuePair<K, T>[] array = new KeyValuePair<K, T>[1];
             const int arrayIndex = 0;
             target.CopyTo(array, arrayIndex);
         }
@@ -169,16 +158,17 @@ namespace TestProject.RedBlackTree
         [TestMethod]
         public void CopyToTest()
         {
-            CopyToTestHelper<GenericParameterHelper>();
+            CopyToTestHelper<string, GenericParameterHelper>();
         }
 
         /// <summary>
         ///A test for Equals
         ///</summary>
-        public void EqualsTestHelper<T>()
-            where T : class , IComparable
+        public void EqualsTestHelper<K, T>()
+            where T : class
+            where K : IComparable
         {
-            RedBlackTree<T> target = new RedBlackTree<T>();
+            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
             object obj = 5;
             const bool expected = false;
             bool actual = target.Equals(obj);
@@ -188,18 +178,18 @@ namespace TestProject.RedBlackTree
         [TestMethod]
         public void EqualsTest()
         {
-            EqualsTestHelper<GenericParameterHelper>();
+            EqualsTestHelper<string, GenericParameterHelper>();
         }
 
         /// <summary>
         ///A test for GetData
         ///</summary>
-        public void GetDataTestHelper<T>(T testItem)
-            where T : class , IComparable
+        public void GetDataTestHelper<K, T>(K key, T testItem)
+            where T : class
+            where K : IComparable
         {
-            RedBlackTree<T> target = new RedBlackTree<T>();
-            target.Add(testItem);
-            IComparable key = testItem;
+            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
+            target.Add(key, testItem);
             T expected = testItem;
             T actual = target.GetData(key);
             Assert.AreEqual(expected, actual);
@@ -208,45 +198,51 @@ namespace TestProject.RedBlackTree
         [TestMethod]
         public void GetDataTest()
         {
-            GetDataTestHelper(new GenericParameterHelper(5));
+            GetDataTestHelper(5, new GenericParameterHelper(5));
         }
 
         /// <summary>
         ///A test for GetEnumerator
         ///</summary>
-        public void GetEnumeratorTestHelper<T>(T[] items)
-            where T : class , IComparable
+        public void GetEnumeratorTestHelper<K, T>(KeyValuePair<K, T>[] items)
+            where T : class
+            where K : IComparable
         {
-            RedBlackTree<T> target = new RedBlackTree<T>();
-            foreach (T item in items)
+            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
+            foreach (KeyValuePair<K, T> item in items)
             {
                 target.Add(item);
             }
-            List<T> list = new List<T>(target);
+            List<T> list = new List<T>(target.Select(i => i.Value));
             Assert.AreEqual(3, list.Count);
         }
 
         [TestMethod]
         public void GetEnumeratorTest()
         {
-            GetEnumeratorTestHelper(new[]
-                                        {
-                                            new GenericParameterHelper(5),
-                                            new GenericParameterHelper(6),
-                                            new GenericParameterHelper(7)
-                                        });
+            GetEnumeratorTestHelper(
+                new[]
+                    {
+                        new KeyValuePair<int, GenericParameterHelper>
+                            (5, new GenericParameterHelper(5)),
+                        new KeyValuePair<int, GenericParameterHelper>
+                            (6, new GenericParameterHelper(6)),
+                        new KeyValuePair<int, GenericParameterHelper>
+                            (7, new GenericParameterHelper(7))
+                    });
         }
 
         /// <summary>
         ///A test for GetMaxKey
         ///</summary>
-        public void GetMaxKeyTestHelper<T>(T[] items, T max)
-            where T : class , IComparable
+        public void GetMaxKeyTestHelper<K, T>(KeyValuePair<K, T>[] items, K max)
+            where T : class
+            where K : IComparable
         {
-            RedBlackTree<T> target = new RedBlackTree<T>();
-            foreach (T item in items)
+            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
+            foreach (KeyValuePair<K, T> item in items)
                 target.Add(item);
-            IComparable expected = max;
+            K expected = max;
             IComparable actual = target.GetMaxKey();
             Assert.AreEqual(expected, actual);
         }
@@ -254,22 +250,27 @@ namespace TestProject.RedBlackTree
         [TestMethod]
         public void GetMaxKeyTest()
         {
-            GetMaxKeyTestHelper(new[]
-                                    {
-                                        new GenericParameterHelper(5),
-                                        new GenericParameterHelper(10),
-                                        new GenericParameterHelper(6)
-                                    }, new GenericParameterHelper(10));
+            GetMaxKeyTestHelper(
+                new[]
+                    {
+                        new KeyValuePair<int, GenericParameterHelper>(
+                            5, new GenericParameterHelper(5)),
+                        new KeyValuePair<int, GenericParameterHelper>(
+                            10, new GenericParameterHelper(10)),
+                        new KeyValuePair<int, GenericParameterHelper>(
+                            6, new GenericParameterHelper(6))
+                    }, 10);
         }
 
         /// <summary>
         ///A test for GetMaxValue
         ///</summary>
-        public void GetMaxValueTestHelper<T>(T[] items, T max)
-            where T : class , IComparable
+        public void GetMaxValueTestHelper<K, T>(KeyValuePair<K, T>[] items, T max)
+            where T : class
+            where K : IComparable
         {
-            RedBlackTree<T> target = new RedBlackTree<T>(); // TODO: Initialize to an appropriate value
-            foreach (T item in items)
+            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
+            foreach (KeyValuePair<K, T> item in items)
                 target.Add(item);
             T expected = max;
             T actual = target.GetMaxValue();
@@ -281,22 +282,26 @@ namespace TestProject.RedBlackTree
         {
             GetMaxValueTestHelper(new[]
                                       {
-                                          new GenericParameterHelper(5),
-                                          new GenericParameterHelper(10),
-                                          new GenericParameterHelper(6)
+                                          new KeyValuePair<int, GenericParameterHelper>(
+                                              5, new GenericParameterHelper(5)),
+                                          new KeyValuePair<int, GenericParameterHelper>(
+                                              10, new GenericParameterHelper(10)),
+                                          new KeyValuePair<int, GenericParameterHelper>(
+                                              6, new GenericParameterHelper(6))
                                       }, new GenericParameterHelper(10));
         }
 
         /// <summary>
         ///A test for GetMinKey
         ///</summary>
-        public void GetMinKeyTestHelper<T>(T[] items, T min)
-            where T : class , IComparable
+        public void GetMinKeyTestHelper<K, T>(KeyValuePair<K, T>[] items, K min)
+            where T : class
+            where K : IComparable
         {
-            RedBlackTree<T> target = new RedBlackTree<T>(); // TODO: Initialize to an appropriate value
-            foreach (T item in items)
+            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
+            foreach (KeyValuePair<K, T> item in items)
                 target.Add(item);
-            IComparable expected = min; // TODO: Initialize to an appropriate value
+            IComparable expected = min;
             IComparable actual = target.GetMinKey();
             Assert.AreEqual(expected, actual);
         }
@@ -306,20 +311,24 @@ namespace TestProject.RedBlackTree
         {
             GetMinKeyTestHelper(new[]
                                     {
-                                        new GenericParameterHelper(5),
-                                        new GenericParameterHelper(10),
-                                        new GenericParameterHelper(6)
-                                    }, new GenericParameterHelper(5));
+                                        new KeyValuePair<int, GenericParameterHelper>(
+                                            5, new GenericParameterHelper(5)),
+                                        new KeyValuePair<int, GenericParameterHelper>(
+                                            10, new GenericParameterHelper(10)),
+                                        new KeyValuePair<int, GenericParameterHelper>(
+                                            6, new GenericParameterHelper(6))
+                                    }, 5);
         }
 
         /// <summary>
         ///A test for GetMinValue
         ///</summary>
-        public void GetMinValueTestHelper<T>(T[] items, T min)
-            where T : class , IComparable
+        public void GetMinValueTestHelper<K, T>(KeyValuePair<K, T>[] items, T min)
+            where T : class
+            where K : IComparable
         {
-            RedBlackTree<T> target = new RedBlackTree<T>();
-            foreach (T item in items)
+            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
+            foreach (KeyValuePair<K, T> item in items)
                 target.Add(item);
             T expected = min;
             T actual = target.GetMinValue();
@@ -331,19 +340,23 @@ namespace TestProject.RedBlackTree
         {
             GetMinValueTestHelper(new[]
                                       {
-                                          new GenericParameterHelper(5),
-                                          new GenericParameterHelper(10),
-                                          new GenericParameterHelper(6)
+                                          new KeyValuePair<int, GenericParameterHelper>(
+                                              5, new GenericParameterHelper(5)),
+                                          new KeyValuePair<int, GenericParameterHelper>(
+                                              10, new GenericParameterHelper(10)),
+                                          new KeyValuePair<int, GenericParameterHelper>(
+                                              6, new GenericParameterHelper(6))
                                       }, new GenericParameterHelper(5));
         }
 
         /// <summary>
         ///A test for IsEmpty
         ///</summary>
-        public void IsEmptyTestHelper<T>()
-            where T : class , IComparable
+        public void IsEmptyTestHelper<K, T>()
+            where T : class
+            where K : IComparable
         {
-            RedBlackTree<T> target = new RedBlackTree<T>();
+            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
             const bool expected = true;
             bool actual = target.IsEmpty();
             Assert.AreEqual(expected, actual);
@@ -352,16 +365,17 @@ namespace TestProject.RedBlackTree
         [TestMethod]
         public void IsEmptyTest()
         {
-            IsEmptyTestHelper<GenericParameterHelper>();
+            IsEmptyTestHelper<string, GenericParameterHelper>();
         }
 
         /// <summary>
         ///A test for Remove
         ///</summary>
-        public void RemoveTestHelper<T>(T item)
-            where T : class , IComparable
+        public void RemoveTestHelper<K, T>(KeyValuePair<K, T> item)
+            where T : class
+            where K : IComparable
         {
-            RedBlackTree<T> target = new RedBlackTree<T>();
+            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
             target.Add(item);
             const bool expected = true;
             bool actual = target.Remove(item);
@@ -371,18 +385,20 @@ namespace TestProject.RedBlackTree
         [TestMethod]
         public void RemoveTest()
         {
-            RemoveTestHelper(new GenericParameterHelper(5));
+            RemoveTestHelper(
+                new KeyValuePair<int, GenericParameterHelper>(5, new GenericParameterHelper(5)));
         }
 
         /// <summary>
         ///A test for Remove
         ///</summary>
-        public void RemoveTest1Helper<T>(T item)
-            where T : class , IComparable
+        public void RemoveTest1Helper<K, T>(KeyValuePair<K, T> item)
+            where T : class
+            where K : IComparable
         {
-            RedBlackTree<T> target = new RedBlackTree<T>();
+            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
             target.Add(item);
-            IComparable key = item;
+            K key = item.Key;
             target.Remove(key);
             Assert.IsTrue(target.IsEmpty());
         }
@@ -390,17 +406,19 @@ namespace TestProject.RedBlackTree
         [TestMethod]
         public void RemoveTest1()
         {
-            RemoveTest1Helper(new GenericParameterHelper(5));
+            RemoveTest1Helper(
+                new KeyValuePair<int, GenericParameterHelper>(5, new GenericParameterHelper(5)));
         }
 
         /// <summary>
         ///A test for RemoveMax
         ///</summary>
-        public void RemoveMaxTestHelper<T>(T[] items, T min, T max)
-            where T : class , IComparable
+        public void RemoveMaxTestHelper<K, T>(KeyValuePair<K, T>[] items, K min, K max)
+            where T : class
+            where K : IComparable
         {
-            RedBlackTree<T> target = new RedBlackTree<T>();
-            foreach (T item in items)
+            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
+            foreach (KeyValuePair<K, T> item in items)
                 target.Add(item);
             Assert.AreEqual(max, target.GetMaxKey());
             target.RemoveMax();
@@ -412,20 +430,22 @@ namespace TestProject.RedBlackTree
         {
             RemoveMaxTestHelper(new[]
                                     {
-                                        new GenericParameterHelper(5),
-                                        new GenericParameterHelper(6)
-                                    }, new GenericParameterHelper(5),
-                                    new GenericParameterHelper(6));
+                                        new KeyValuePair<int, GenericParameterHelper>(
+                                            5, new GenericParameterHelper(5)),
+                                        new KeyValuePair<int, GenericParameterHelper>(
+                                            6, new GenericParameterHelper(6))
+                                    }, 5, 6);
         }
 
         /// <summary>
         ///A test for RemoveMin
         ///</summary>
-        public void RemoveMinTestHelper<T>(T[] items, T min, T max)
-            where T : class , IComparable
+        public void RemoveMinTestHelper<K, T>(KeyValuePair<K, T>[] items, K min, K max)
+            where T : class
+            where K : IComparable
         {
-            RedBlackTree<T> target = new RedBlackTree<T>();
-            foreach (T item in items)
+            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
+            foreach (KeyValuePair<K, T> item in items)
                 target.Add(item);
             Assert.AreEqual(min, target.GetMinKey());
             target.RemoveMin();
@@ -437,37 +457,21 @@ namespace TestProject.RedBlackTree
         {
             RemoveMinTestHelper(new[]
                                     {
-                                        new GenericParameterHelper(5),
-                                        new GenericParameterHelper(6)
-                                    }, new GenericParameterHelper(5),
-                                new GenericParameterHelper(6));
-        }
-
-        /// <summary>
-        ///A test for ToString
-        ///</summary>
-        public void ToStringTestHelper<T>()
-            where T : class , IComparable
-        {
-            const string expected = "test";
-            RedBlackTree<T> target = new RedBlackTree<T>(expected);
-            string actual = target.ToString();
-            Assert.AreEqual(expected, actual);
-        }
-
-        [TestMethod]
-        public void ToStringTest()
-        {
-            ToStringTestHelper<GenericParameterHelper>();
+                                        new KeyValuePair<int, GenericParameterHelper>(
+                                            5, new GenericParameterHelper(5)),
+                                        new KeyValuePair<int, GenericParameterHelper>(
+                                            6, new GenericParameterHelper(6))
+                                    }, 5, 6);
         }
 
         /// <summary>
         ///A test for Count
         ///</summary>
-        public void CountTestHelper<T>(T x)
-            where T : class , IComparable
+        public void CountTestHelper<K, T>(KeyValuePair<K, T> x)
+            where T : class
+            where K : IComparable
         {
-            RedBlackTree<T> target = new RedBlackTree<T>();
+            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
             Assert.AreEqual(0, target.Count);
             target.Add(x);
             const int expected = 1;
@@ -479,16 +483,18 @@ namespace TestProject.RedBlackTree
         [DeploymentItem("System.Collections.Generic.RedBlack.dll")]
         public void CountTest()
         {
-            CountTestHelper(new GenericParameterHelper(5));
+            CountTestHelper(
+                new KeyValuePair<int, GenericParameterHelper>(5, new GenericParameterHelper(5)));
         }
 
         /// <summary>
         ///A test for IsReadOnly
         ///</summary>
-        public void IsReadOnlyTestHelper<T>()
-            where T : class , IComparable
+        public void IsReadOnlyTestHelper<K, T>()
+            where T : class
+            where K : IComparable
         {
-            RedBlackTree<T> target = new RedBlackTree<T>();
+            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
             bool actual = target.IsReadOnly;
             Assert.IsFalse(actual);
         }
@@ -496,19 +502,20 @@ namespace TestProject.RedBlackTree
         [TestMethod]
         public void IsReadOnlyTest()
         {
-            IsReadOnlyTestHelper<GenericParameterHelper>();
+            IsReadOnlyTestHelper<string, GenericParameterHelper>();
         }
 
         /// <summary>
         ///A test for Item
         ///</summary>
-        public void ItemTestHelper<T>(T item)
-            where T : class , IComparable
+        public void ItemTestHelper<K, T>(KeyValuePair<K, T> item)
+            where T : class
+            where K : IComparable
         {
-            RedBlackTree<T> target = new RedBlackTree<T>();
+            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
             target.Add(item);
-            IComparable key = item;
-            T expected = item;
+            K key = item.Key;
+            T expected = item.Value;
             target[key] = expected;
             T actual = target[key];
             Assert.AreEqual(expected, actual);
@@ -517,7 +524,7 @@ namespace TestProject.RedBlackTree
         [TestMethod]
         public void ItemTest()
         {
-            ItemTestHelper(new GenericParameterHelper(5));
+            ItemTestHelper(new KeyValuePair<int, GenericParameterHelper>(5, new GenericParameterHelper(5)));
         }
     }
 }
