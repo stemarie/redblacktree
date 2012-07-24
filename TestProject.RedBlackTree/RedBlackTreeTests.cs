@@ -11,7 +11,7 @@ namespace TestProject.RedBlackTree
     ///to contain all RedBlackTreeTest Unit Tests
     ///</summary>
     [TestClass]
-    public class RedBlackTreeTest
+    public class RedBlackTreeTests
     {
         private TestContext testContextInstance;
 

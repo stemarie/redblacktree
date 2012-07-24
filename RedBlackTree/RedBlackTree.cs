@@ -710,7 +710,7 @@ namespace System.Collections.Generic.RedBlack
             try
             {
                 var node = GetNode(key);
-                return true;
+                return node != null;
             }
             catch (RedBlackException)
             {
