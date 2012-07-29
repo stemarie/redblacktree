@@ -9,11 +9,16 @@ using System.Linq;
 
 namespace System.Collections.Generic.RedBlack
 {
+    /// <summary>
+    /// Red Black Tree Implementation
+    /// </summary>
+    /// <typeparam name="K">Genric Key Type</typeparam>
+    /// <typeparam name="T">Generit Type</typeparam>
     public class RedBlackTree<K, T> : IDictionary<K, T>
         where T : class
         where K : IComparable
     {
-        public enum RedBlackNodeType
+        internal enum RedBlackNodeType
         {
             Red = 0,
             Black = 1
@@ -70,6 +75,9 @@ namespace System.Collections.Generic.RedBlack
             return Remove(item.Key);
         }
 
+        /// <summary>
+        /// Returns the number of items in the tree
+        /// </summary>
         public int Count { get; private set; }
 
         /// <summary>
@@ -209,6 +217,7 @@ namespace System.Collections.Generic.RedBlack
         {
             _treeBaseNode = SentinelNode;
             Count = 0;
+            InvokeOnClear(new EventArgs());
         }
 
         /// <summary>
@@ -235,12 +244,12 @@ namespace System.Collections.Generic.RedBlack
                 throw new ArgumentNullException();
             if ((array.Length - arrayIndex) < Count)
                 throw new ArgumentException();
-            int _currentPosition = arrayIndex;
+            int currentPosition = arrayIndex;
             foreach (KeyValuePair<K, T> item in GetAll()
                 .Select(i => new KeyValuePair<K, T>(i.Key, i.Data)))
             {
-                array[_currentPosition] = item;
-                _currentPosition++;
+                array[currentPosition] = item;
+                currentPosition++;
             }
         }
 
@@ -349,6 +358,7 @@ namespace System.Collections.Generic.RedBlack
             _lastNodeFound = _newNode;
 
             Count++;
+            InvokeOnAdd(new RedBlackEventArgs<K, T> { Item = data, Key = key });
         }
 
         ///<summary>
@@ -413,6 +423,7 @@ namespace System.Collections.Generic.RedBlack
             _lastNodeFound = SentinelNode;
 
             Count--;
+            InvokeOnRemove(new RedBlackEventArgs<K, T> { Item = node.Data, Key = node.Key });
         }
 
         ///<summary>
@@ -793,6 +804,39 @@ namespace System.Collections.Generic.RedBlack
         public ICollection<T> Values
         {
             get { return GetAll().Select(i => i.Data).ToArray(); }
+        }
+
+        /// <summary>
+        /// Invoked when Item is added
+        /// </summary>
+        public event EventHandler OnAdd;
+
+        protected void InvokeOnAdd(RedBlackEventArgs<K, T> e)
+        {
+            EventHandler handler = OnAdd;
+            if (handler != null) handler(this, e);
+        }
+        
+        /// <summary>
+        /// Invoked when Item is removed
+        /// </summary>
+        public event EventHandler OnRemove;
+
+        protected void InvokeOnRemove(RedBlackEventArgs<K, T> e)
+        {
+            EventHandler handler = OnRemove;
+            if (handler != null) handler(this, e);
+        }
+
+        /// <summary>
+        /// Invoked when tree is cleared
+        /// </summary>
+        public event EventHandler OnClear;
+
+        protected void InvokeOnClear(EventArgs e)
+        {
+            EventHandler handler = OnClear;
+            if (handler != null) handler(this, e);
         }
     }
 }
