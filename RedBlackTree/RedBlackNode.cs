@@ -27,6 +27,32 @@ namespace System.Collections.Generic.RedBlack
             Left = RedBlackTree<K, T>.SentinelNode;
         }
 
+        public RedBlackNode<K, T> DirectionTrue(Direction direction)
+        {
+            switch (direction)
+            {
+                case Direction.Right:
+                    return Right;
+                case Direction.Left:
+                    return Left;
+                default:
+                    return null;
+            }
+        }
+
+        public RedBlackNode<K, T> DirectionOpposite(Direction direction)
+        {
+            switch (direction)
+            {
+                case Direction.Right:
+                    return Left;
+                case Direction.Left:
+                    return Right;
+                default:
+                    return null;
+            }
+        }
+
         public RedBlackNode(K key, T data)
             : this()
         {

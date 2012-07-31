@@ -9,11 +9,19 @@ using System.Linq;
 
 namespace System.Collections.Generic.RedBlack
 {
+    /// <summary>
+    /// Red Black Tree Implementation
+    /// </summary>
+    /// <typeparam name="K">Key type</typeparam>
+    /// <typeparam name="T">Data type</typeparam>
+    /// <example>
+    /// var x = new RedBlackTree&lt;Guid,String&gt;();
+    /// </example>
     public class RedBlackTree<K, T> : IDictionary<K, T>
         where T : class
         where K : IComparable
     {
-        public enum RedBlackNodeType
+        internal enum RedBlackNodeType
         {
             Red = 0,
             Black = 1
@@ -47,11 +55,29 @@ namespace System.Collections.Generic.RedBlack
                 Color = RedBlackNodeType.Black
             };
 
+        /// <summary>
+        /// Constructor that initializes a blank Red Black Tree
+        /// </summary>
+        /// <example>
+        /// var x = new RedBlackTree&lt;Guid,String&gt;();
+        /// </example>
         public RedBlackTree()
         {
             Initialize(base.ToString() + _rand.Next());
         }
 
+        /// <summary>
+        /// Get a value stored in the tree using a key
+        /// </summary>
+        /// <param name="key">key of the item to be returned</param>
+        /// <returns>value stored in the tree, null if it does not exist</returns>
+        /// <example>
+        /// Guid id = Guid.NewGuid();
+        /// var x = new RedBlackTree&lt;Guid,String&gt;();
+        /// var y = new KeyValuePair&lt;Guid,String&gt; { id, "Hello" };
+        /// x.Add(y);
+        /// var y = x[id];
+        /// </example>
         public T this[K key]
         {
             get { return GetNode(key).Data; }
@@ -65,11 +91,22 @@ namespace System.Collections.Generic.RedBlack
         /// true if <paramref name="item"/> was successfully removed from the <see cref="T:System.Collections.Generic.ICollection`1"/>; otherwise, false. This method also returns false if <paramref name="item"/> is not found in the original <see cref="T:System.Collections.Generic.ICollection`1"/>.
         /// </returns>
         /// <param name="item">The object to remove from the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.</exception>
+        /// <example>
+        /// Guid id = Guid.NewGuid();
+        /// var x = new RedBlackTree&lt;Guid,String&gt;();
+        /// var y = new KeyValuePair&lt;Guid,String&gt; { id, "Hello" };
+        /// x.Add(y);
+        /// x.Remove(y);
+        /// </example>
+        /// <remarks>The Red Black Tree implementation actually ignores the Value portion in the case of the delete, it removes the node with the matching Key</remarks>
         public bool Remove(KeyValuePair<K, T> item)
         {
             return Remove(item.Key);
         }
 
+        /// <summary>
+        /// Returns the number of items currently in the tree
+        /// </summary>
         public int Count { get; private set; }
 
         /// <summary>
@@ -87,6 +124,7 @@ namespace System.Collections.Generic.RedBlack
         /// GetData
         /// Gets the data object associated with the specified key
         ///</summary>
+        /// <remarks>This is the equivalent of calling T this[K key]</remarks>
         public T GetData(K key)
         {
             return GetNode(key).Data;
@@ -311,6 +349,103 @@ namespace System.Collections.Generic.RedBlack
             return _strIdentifier;
         }
 
+        /// <summary>
+        /// Determines whether the <see cref="T:System.Collections.Generic.IDictionary`2"/> contains an element with the specified key.
+        /// </summary>
+        /// <returns>
+        /// true if the <see cref="T:System.Collections.Generic.IDictionary`2"/> contains an element with the key; otherwise, false.
+        /// </returns>
+        /// <param name="key">The key to locate in the <see cref="T:System.Collections.Generic.IDictionary`2"/>.</param><exception cref="T:System.ArgumentNullException"><paramref name="key"/> is null.</exception>
+        public bool ContainsKey(K key)
+        {
+            try
+            {
+                var node = GetNode(key);
+                return node != null;
+            }
+            catch (RedBlackException)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Adds an element with the provided key and value to the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+        /// </summary>
+        /// <param name="key">The object to use as the key of the element to add.</param><param name="value">The object to use as the value of the element to add.</param><exception cref="T:System.ArgumentNullException"><paramref name="key"/> is null.</exception><exception cref="T:System.ArgumentException">An element with the same key already exists in the <see cref="T:System.Collections.Generic.IDictionary`2"/>.</exception><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.IDictionary`2"/> is read-only.</exception>
+        public void Add(K key, T value)
+        {
+            New(key, value);
+        }
+
+        /// <summary>
+        /// Removes the element with the specified key from the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+        /// </summary>
+        /// <returns>
+        /// true if the element is successfully removed; otherwise, false.  This method also returns false if <paramref name="key"/> was not found in the original <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+        /// </returns>
+        /// <param name="key">The key of the element to remove.</param><exception cref="T:System.ArgumentNullException"><paramref name="key"/> is null.</exception><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.IDictionary`2"/> is read-only.</exception>
+        public bool Remove(K key)
+        {
+            try
+            {
+                Delete(GetNode(key));
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the value associated with the specified key.
+        /// </summary>
+        /// <returns>
+        /// true if the object that implements <see cref="T:System.Collections.Generic.IDictionary`2"/> contains an element with the specified key; otherwise, false.
+        /// </returns>
+        /// <param name="key">The key whose value to get.</param><param name="value">When this method returns, the value associated with the specified key, if the key is found; otherwise, the default value for the type of the <paramref name="value"/> parameter. This parameter is passed uninitialized.</param><exception cref="T:System.ArgumentNullException"><paramref name="key"/> is null.</exception>
+        public bool TryGetValue(K key, out T value)
+        {
+            value = GetNode(key).Data;
+            return (value != null);
+        }
+
+        /// <summary>
+        /// Gets or sets the element with the specified key.
+        /// </summary>
+        /// <returns>
+        /// The element with the specified key.
+        /// </returns>
+        /// <param name="key">The key of the element to get or set.</param><exception cref="T:System.ArgumentNullException"><paramref name="key"/> is null.</exception><exception cref="T:System.Collections.Generic.KeyNotFoundException">The property is retrieved and <paramref name="key"/> is not found.</exception><exception cref="T:System.NotSupportedException">The property is set and the <see cref="T:System.Collections.Generic.IDictionary`2"/> is read-only.</exception>
+        T IDictionary<K, T>.this[K key]
+        {
+            get { return GetNode(key).Data; }
+            set { GetNode(key).Data = value; }
+        }
+
+        /// <summary>
+        /// Gets an <see cref="T:System.Collections.Generic.ICollection`1"/> containing the keys of the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="T:System.Collections.Generic.ICollection`1"/> containing the keys of the object that implements <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+        /// </returns>
+        public ICollection<K> Keys
+        {
+            get { return GetAll().Select(i => i.Key).ToArray(); }
+        }
+
+        /// <summary>
+        /// Gets an <see cref="T:System.Collections.Generic.ICollection`1"/> containing the values in the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="T:System.Collections.Generic.ICollection`1"/> containing the values in the object that implements <see cref="T:System.Collections.Generic.IDictionary`2"/>.
+        /// </returns>
+        public ICollection<T> Values
+        {
+            get { return GetAll().Select(i => i.Data).ToArray(); }
+        }
+
         #region "Private Methods"
 
         private void New(K key, T data)
@@ -518,6 +653,11 @@ namespace System.Collections.Generic.RedBlack
                 WalkNextLevel(node.Left, stack);
         }
 
+        /// <summary>
+        /// Returns a node from the tree using the supplied key
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns>The Node or null if the key does not exist</returns>
         private RedBlackNode<K, T> GetNode(K key)
         {
             int result;
@@ -697,102 +837,5 @@ namespace System.Collections.Generic.RedBlack
         }
 
         #endregion
-
-        /// <summary>
-        /// Determines whether the <see cref="T:System.Collections.Generic.IDictionary`2"/> contains an element with the specified key.
-        /// </summary>
-        /// <returns>
-        /// true if the <see cref="T:System.Collections.Generic.IDictionary`2"/> contains an element with the key; otherwise, false.
-        /// </returns>
-        /// <param name="key">The key to locate in the <see cref="T:System.Collections.Generic.IDictionary`2"/>.</param><exception cref="T:System.ArgumentNullException"><paramref name="key"/> is null.</exception>
-        public bool ContainsKey(K key)
-        {
-            try
-            {
-                var node = GetNode(key);
-                return node != null;
-            }
-            catch (RedBlackException)
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Adds an element with the provided key and value to the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
-        /// </summary>
-        /// <param name="key">The object to use as the key of the element to add.</param><param name="value">The object to use as the value of the element to add.</param><exception cref="T:System.ArgumentNullException"><paramref name="key"/> is null.</exception><exception cref="T:System.ArgumentException">An element with the same key already exists in the <see cref="T:System.Collections.Generic.IDictionary`2"/>.</exception><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.IDictionary`2"/> is read-only.</exception>
-        public void Add(K key, T value)
-        {
-            New(key, value);
-        }
-
-        /// <summary>
-        /// Removes the element with the specified key from the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
-        /// </summary>
-        /// <returns>
-        /// true if the element is successfully removed; otherwise, false.  This method also returns false if <paramref name="key"/> was not found in the original <see cref="T:System.Collections.Generic.IDictionary`2"/>.
-        /// </returns>
-        /// <param name="key">The key of the element to remove.</param><exception cref="T:System.ArgumentNullException"><paramref name="key"/> is null.</exception><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.IDictionary`2"/> is read-only.</exception>
-        public bool Remove(K key)
-        {
-            try
-            {
-                Delete(GetNode(key));
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Gets the value associated with the specified key.
-        /// </summary>
-        /// <returns>
-        /// true if the object that implements <see cref="T:System.Collections.Generic.IDictionary`2"/> contains an element with the specified key; otherwise, false.
-        /// </returns>
-        /// <param name="key">The key whose value to get.</param><param name="value">When this method returns, the value associated with the specified key, if the key is found; otherwise, the default value for the type of the <paramref name="value"/> parameter. This parameter is passed uninitialized.</param><exception cref="T:System.ArgumentNullException"><paramref name="key"/> is null.</exception>
-        public bool TryGetValue(K key, out T value)
-        {
-            value = GetNode(key).Data;
-            return (value != null);
-        }
-
-        /// <summary>
-        /// Gets or sets the element with the specified key.
-        /// </summary>
-        /// <returns>
-        /// The element with the specified key.
-        /// </returns>
-        /// <param name="key">The key of the element to get or set.</param><exception cref="T:System.ArgumentNullException"><paramref name="key"/> is null.</exception><exception cref="T:System.Collections.Generic.KeyNotFoundException">The property is retrieved and <paramref name="key"/> is not found.</exception><exception cref="T:System.NotSupportedException">The property is set and the <see cref="T:System.Collections.Generic.IDictionary`2"/> is read-only.</exception>
-        T IDictionary<K, T>.this[K key]
-        {
-            get { return GetNode(key).Data; }
-            set { GetNode(key).Data = value; }
-        }
-
-        /// <summary>
-        /// Gets an <see cref="T:System.Collections.Generic.ICollection`1"/> containing the keys of the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
-        /// </summary>
-        /// <returns>
-        /// An <see cref="T:System.Collections.Generic.ICollection`1"/> containing the keys of the object that implements <see cref="T:System.Collections.Generic.IDictionary`2"/>.
-        /// </returns>
-        public ICollection<K> Keys
-        {
-            get { return GetAll().Select(i => i.Key).ToArray(); }
-        }
-
-        /// <summary>
-        /// Gets an <see cref="T:System.Collections.Generic.ICollection`1"/> containing the values in the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
-        /// </summary>
-        /// <returns>
-        /// An <see cref="T:System.Collections.Generic.ICollection`1"/> containing the values in the object that implements <see cref="T:System.Collections.Generic.IDictionary`2"/>.
-        /// </returns>
-        public ICollection<T> Values
-        {
-            get { return GetAll().Select(i => i.Data).ToArray(); }
-        }
     }
 }
