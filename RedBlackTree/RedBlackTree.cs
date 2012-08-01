@@ -274,10 +274,10 @@ namespace System.Collections.Generic.RedBlack
             if ((array.Length - arrayIndex) < Count)
                 throw new ArgumentException();
             int _currentPosition = arrayIndex;
-            foreach (KeyValuePair<K, T> item in GetAll()
-                .Select(i => new KeyValuePair<K, T>(i.Key, i.Data)))
+            foreach (T item in GetAll()
+                .Select(i => i.Data))
             {
-                array[_currentPosition] = item;
+                array.SetValue(item, _currentPosition);
                 _currentPosition++;
             }
         }
@@ -630,7 +630,7 @@ namespace System.Collections.Generic.RedBlack
             node.Color = RedBlackNodeType.Black;
         }
 
-        private Stack<RedBlackNode<K, T>> GetAll()
+        internal Stack<RedBlackNode<K, T>> GetAll()
         {
             Stack<RedBlackNode<K, T>> stack = new Stack<RedBlackNode<K, T>>();
 

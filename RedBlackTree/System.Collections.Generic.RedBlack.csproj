@@ -111,6 +111,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="RedBlackQueue.cs" />
     <Compile Include="RedBlackTree.cs">
       <SubType>Code</SubType>
     </Compile>
