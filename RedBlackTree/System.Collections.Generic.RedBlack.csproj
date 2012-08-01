@@ -112,6 +112,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="RedBlackQueue.cs" />
+    <Compile Include="RedBlackEventArgs.cs" />
     <Compile Include="RedBlackTree.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -145,6 +146,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

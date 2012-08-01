@@ -11,7 +11,7 @@ namespace System.Collections.Generic.RedBlack
 
         public K Key { get; set; }
 
-        public RedBlackTree<K, T>.RedBlackNodeType Color { get; set; }
+        internal RedBlackTree<K, T>.RedBlackNodeType Color { get; set; }
 
         public RedBlackNode<K, T> Left { get; set; }
 

@@ -247,6 +247,7 @@ namespace System.Collections.Generic.RedBlack
         {
             _treeBaseNode = SentinelNode;
             Count = 0;
+            InvokeOnClear(new EventArgs());
         }
 
         /// <summary>
@@ -484,6 +485,7 @@ namespace System.Collections.Generic.RedBlack
             _lastNodeFound = _newNode;
 
             Count++;
+            InvokeOnAdd(new RedBlackEventArgs<K, T> { Item = data, Key = key });
         }
 
         ///<summary>
@@ -548,6 +550,7 @@ namespace System.Collections.Generic.RedBlack
             _lastNodeFound = SentinelNode;
 
             Count--;
+            InvokeOnRemove(new RedBlackEventArgs<K, T> { Item = node.Data, Key = node.Key });
         }
 
         ///<summary>
@@ -837,5 +840,38 @@ namespace System.Collections.Generic.RedBlack
         }
 
         #endregion
+
+        /// <summary>
+        /// Invoked when Item is added
+        /// </summary>
+        public event EventHandler OnAdd;
+
+        protected void InvokeOnAdd(RedBlackEventArgs<K, T> e)
+        {
+            EventHandler handler = OnAdd;
+            if (handler != null) handler(this, e);
+        }
+        
+        /// <summary>
+        /// Invoked when Item is removed
+        /// </summary>
+        public event EventHandler OnRemove;
+
+        protected void InvokeOnRemove(RedBlackEventArgs<K, T> e)
+        {
+            EventHandler handler = OnRemove;
+            if (handler != null) handler(this, e);
+        }
+
+        /// <summary>
+        /// Invoked when tree is cleared
+        /// </summary>
+        public event EventHandler OnClear;
+
+        protected void InvokeOnClear(EventArgs e)
+        {
+            EventHandler handler = OnClear;
+            if (handler != null) handler(this, e);
+        }
     }
 }
