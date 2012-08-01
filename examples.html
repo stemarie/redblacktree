@@ -11,9 +11,9 @@
     <!-- HEADER -->
     <div id="header_wrap" class="outer">
         <header class="inner">
-          <a id="forkme_banner" href="https://github.com/stemarie/redblacktree">View on GitHub</a>
-          <h1 id="project_title">RedBlack Tree</h1>
-          <h2 id="project_tagline">Generic RedBlack Tree in C#</h2>
+            <a id="forkme_banner" href="https://github.com/stemarie/redblacktree">View on GitHub</a>
+            <h1 id="project_title">Redblacktree</h1>
+            <h2 id="project_tagline">Red Black Generic Tree in C#</h2>
             <section id="downloads">
               <a class="zip_download_link" href="https://github.com/stemarie/redblacktree/zipball/master">Download this project as a .zip file</a>
               <a class="tar_download_link" href="https://github.com/stemarie/redblacktree/tarball/master">Download this project as a tar.gz file</a>
@@ -27,17 +27,27 @@
                 <a href="index.html">System.Collections.Generic.RedBlack</a>
             </h1>
             <p>Red Black Generic Tree in C#</p>
-            <p>Now Available on NuGet.org as a package
-                <a href="https://www.nuget.org/packages/System.Collections.Generic.RedBlack">System.Collections.Generic.RedBlack</a></p>
-            <p>See it in action - <a href="examples.html">examples</a></p>
+            <p>
+                RedBlackTree&lt;Guid, string&gt; tree = new RedBlackTree&lt;Guid, string&gt;();<br/>
+                Guid item1 = Guid.NewGuid();<br/>
+                Guid item2 = Guid.NewGuid();<br/>
+                for (int i = 0; i &lt; 100; i++)<br/>
+                {<br/>
+                    tree.Add(Guid.NewGuid(), DateTime.UtcNow.ToString(CultureInfo.InvariantCulture));<br/>
+                }<br/>
+                tree.Add(item1, DateTime.UtcNow.ToString(CultureInfo.InvariantCulture));<br/>
+                tree.Add(item2, DateTime.UtcNow.ToString(CultureInfo.InvariantCulture));<br/>
+                tree.Remove(item1);<br/>
+                tree.Remove(item2);<br/>
+            </p>
       </section>
     </div>
     <!-- FOOTER  -->
     <div id="footer_wrap" class="outer">
         <footer class="inner">
-        <p class="copyright">Redblacktree maintained by <a href="https://github.com/stemarie">stemarie</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
+            <p class="copyright">Redblacktree maintained by <a href="https://github.com/stemarie">stemarie</a></p>
+            <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+        </footer>
     </div>
     <script type="text/javascript">
         var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
