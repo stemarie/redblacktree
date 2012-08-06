@@ -99,7 +99,7 @@ namespace System.Collections.Generic.RedBlack
         /// x.Remove(y);
         /// </example>
         /// <remarks>The Red Black Tree implementation actually ignores the Value portion in the case of the delete, it removes the node with the matching Key</remarks>
-        public bool Remove(KeyValuePair<K, T> item)
+        public virtual bool Remove(KeyValuePair<K, T> item)
         {
             return Remove(item.Key);
         }
@@ -234,7 +234,7 @@ namespace System.Collections.Generic.RedBlack
         /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
         /// </summary>
         /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.</exception>
-        public void Add(KeyValuePair<K, T> item)
+        public virtual void Add(KeyValuePair<K, T> item)
         {
             New(item.Key, item.Value);
         }
@@ -374,7 +374,7 @@ namespace System.Collections.Generic.RedBlack
         /// Adds an element with the provided key and value to the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
         /// </summary>
         /// <param name="key">The object to use as the key of the element to add.</param><param name="value">The object to use as the value of the element to add.</param><exception cref="T:System.ArgumentNullException"><paramref name="key"/> is null.</exception><exception cref="T:System.ArgumentException">An element with the same key already exists in the <see cref="T:System.Collections.Generic.IDictionary`2"/>.</exception><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.IDictionary`2"/> is read-only.</exception>
-        public void Add(K key, T value)
+        public virtual void Add(K key, T value)
         {
             New(key, value);
         }
@@ -386,7 +386,7 @@ namespace System.Collections.Generic.RedBlack
         /// true if the element is successfully removed; otherwise, false.  This method also returns false if <paramref name="key"/> was not found in the original <see cref="T:System.Collections.Generic.IDictionary`2"/>.
         /// </returns>
         /// <param name="key">The key of the element to remove.</param><exception cref="T:System.ArgumentNullException"><paramref name="key"/> is null.</exception><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.IDictionary`2"/> is read-only.</exception>
-        public bool Remove(K key)
+        public virtual bool Remove(K key)
         {
             try
             {
