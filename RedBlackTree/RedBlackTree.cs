@@ -1,10 +1,3 @@
-// A red-black tree must satisfy these properties:
-//
-// 1. The root is black. 
-// 2. All leaves are black. 
-// 3. Red nodes can only have black children. 
-// 4. All paths from a node to its leaves contain the same number of black nodes.
-
 using System.Linq;
 
 namespace System.Collections.Generic.RedBlack
