@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace System.Collections.Generic.RedBlack
+namespace System.Collections.Generic.RedBlack.Beta
 {
     /// <summary>
     /// RedBlack Tree-based priority queue

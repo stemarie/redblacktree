@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Xml.Serialization;
 
-namespace System.Collections.Generic.RedBlack
+namespace System.Collections.Generic.RedBlack.Beta
 {
     public class RedBlackTreePersistent<K, T>
         : RedBlackTree<K, T>

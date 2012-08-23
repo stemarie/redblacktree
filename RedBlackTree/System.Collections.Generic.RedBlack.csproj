@@ -112,7 +112,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="RedBlackQueue.cs" />
+    <Compile Include="Beta\RedBlackQueue.cs" />
     <Compile Include="RedBlackEventArgs.cs" />
     <Compile Include="RedBlackTree.cs">
       <SubType>Code</SubType>
@@ -123,7 +123,7 @@
     <Compile Include="RedBlackNode.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="RedBlackTreePersistent.cs" />
+    <Compile Include="Beta\RedBlackTreePersistent.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
