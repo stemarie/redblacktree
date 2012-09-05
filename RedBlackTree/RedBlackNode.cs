@@ -3,31 +3,31 @@ namespace System.Collections.Generic.RedBlack
     /// <summary>
     /// The RedBlackNode class encapsulates a node in the tree
     /// </summary>
-    internal class RedBlackNode<K, T>
-        where T : class
-        where K : IComparable
+    internal class RedBlackNode<TKey, TValue>
+        where TValue : class
+        where TKey : IComparable
     {
-        public T Data { get; set; }
+        public TValue Data { get; set; }
 
-        public K Key { get; set; }
+        public TKey Key { get; set; }
 
-        internal RedBlackTree<K, T>.RedBlackNodeType Color { get; set; }
+        internal RedBlackTree<TKey, TValue>.RedBlackNodeType Color { get; set; }
 
-        public RedBlackNode<K, T> Left { get; set; }
+        public RedBlackNode<TKey, TValue> Left { get; set; }
 
-        public RedBlackNode<K, T> Right { get; set; }
+        public RedBlackNode<TKey, TValue> Right { get; set; }
 
-        public RedBlackNode<K, T> Parent { get; set; }
+        public RedBlackNode<TKey, TValue> Parent { get; set; }
 
         public RedBlackNode()
         {
-            Color = RedBlackTree<K, T>.RedBlackNodeType.Red;
+            Color = RedBlackTree<TKey, TValue>.RedBlackNodeType.Red;
 
-            Right = RedBlackTree<K, T>.SentinelNode;
-            Left = RedBlackTree<K, T>.SentinelNode;
+            Right = RedBlackTree<TKey, TValue>.SentinelNode;
+            Left = RedBlackTree<TKey, TValue>.SentinelNode;
         }
 
-        public RedBlackNode(K key, T data)
+        public RedBlackNode(TKey key, TValue data)
             : this()
         {
             Key = key;
