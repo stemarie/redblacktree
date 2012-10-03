@@ -334,7 +334,8 @@ namespace System.Collections.Generic.RedBlack
         /// <filterpriority>1</filterpriority>
         IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator()
         {
-            return GetAll().Select(i => new KeyValuePair<TKey, TValue>(i.Key, i.Data))
+            return GetAll()
+                .Select(i => new KeyValuePair<TKey, TValue>(i.Key, i.Data))
                 .GetEnumerator();
         }
 
@@ -728,7 +729,9 @@ namespace System.Collections.Generic.RedBlack
                     _lastNodeFound = treeNode;
                     return treeNode;
                 }
-                treeNode = result < 0 ? treeNode.Left : treeNode.Right;
+                treeNode = result < 0 
+                    ? treeNode.Left 
+                    : treeNode.Right;
             }
             return null;
         }
