@@ -3,10 +3,11 @@ using System.Xml.Serialization;
 
 namespace System.Collections.Generic.RedBlack.Beta
 {
-    public class RedBlackTreePersistent<K, T>
-        : RedBlackTree<K, T>
-        where K : IComparable
-        where T : class
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
+    public class RedBlackTreePersistent<TKey, TValue>
+        : RedBlackTree<TKey, TValue>
+        where TKey : IComparable
+        where TValue : class
     {
         private readonly string _path;
         private readonly XmlSerializer _serializer;
@@ -14,62 +15,64 @@ namespace System.Collections.Generic.RedBlack.Beta
         public RedBlackTreePersistent(string path)
         {
             _path = path;
-            _serializer = new XmlSerializer(typeof(SerializedItem<K, T>));
-            foreach (string file in Directory.EnumerateFiles(_path, "*" + typeof(T)))
+            _serializer = new XmlSerializer(typeof(SerializedItem<TKey, TValue>));
+            foreach (string file in Directory.EnumerateFiles(_path, "*" + typeof(TValue)))
             {
                 using (StreamReader fileStream = File.OpenText(file))
                 {
-                    SerializedItem<K, T> item = (SerializedItem<K, T>)_serializer.Deserialize(fileStream);
+                    SerializedItem<TKey, TValue> item = (SerializedItem<TKey, TValue>)_serializer.Deserialize(fileStream);
                     base.Add(item.Key, item.Value);
                 }
             }
         }
 
-        public override void Add(K key, T value)
+        public override void Add(TKey key, TValue value)
         {
             base.Add(key, value);
             SaveToFile(key, value);
         }
 
-        public override void Add(KeyValuePair<K, T> item)
+        public override void Add(KeyValuePair<TKey, TValue> item)
         {
             base.Add(item);
             SaveToFile(item.Key, item.Value);
         }
 
-        public override bool Remove(K key)
+        public override bool Remove(TKey key)
         {
             DeleteFromFile(key);
             return base.Remove(key);
         }
 
-        public override bool Remove(KeyValuePair<K, T> item)
+        public override bool Remove(KeyValuePair<TKey, TValue> item)
         {
             DeleteFromFile(item.Key);
             return base.Remove(item);
         }
 
-        private void SaveToFile(K key, T value)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
+        private void SaveToFile(TKey key, TValue value)
         {
             using (StreamWriter file = File.CreateText(GetFullFileName(key)))
             {
-                _serializer.Serialize(file, new SerializedItem<K, T>(key, value));
+                _serializer.Serialize(file, new SerializedItem<TKey, TValue>(key, value));
                 file.Close();
             }
         }
 
-        private string GetFullFileName(K key)
+        private string GetFullFileName(TKey key)
         {
             string fullPath = Path.Combine(_path, GetFileName(key));
             return fullPath;
         }
 
-        private static string GetFileName(K key)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1305:SpecifyIFormatProvider", MessageId = "System.String.Format(System.String,System.Object,System.Object,System.Object)")]
+        private static string GetFileName(TKey key)
         {
-            return string.Format("{0}-{1}.{2}", key, typeof(T), "xml");
+            return string.Format("{0}-{1}.{2}", key, typeof(TValue), "xml");
         }
 
-        private void DeleteFromFile(K key)
+        private void DeleteFromFile(TKey key)
         {
             File.Delete(GetFullFileName(key));
         }

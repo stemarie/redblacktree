@@ -6,17 +6,18 @@ namespace System.Collections.Generic.RedBlack.Beta
     /// RedBlack Tree-based priority queue
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    [Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1035:ICollectionImplementationsHaveStronglyTypedMembers")]
     public class RedBlackQueue<T>
         : IEnumerable<T>, ICollection
         where T : class
     {
-        readonly RedBlackTree<QueuePriority, T> internalTree = new RedBlackTree<QueuePriority, T>();
+        readonly RedBlackTree<QueuePriority, T> _internalTree = new RedBlackTree<QueuePriority, T>();
 
         public void Enqueue(T item)
         {
             lock (this)
             {
-                internalTree.Add(new QueuePriority(), item);
+                _internalTree.Add(new QueuePriority(), item);
             }
         }
 
@@ -24,7 +25,7 @@ namespace System.Collections.Generic.RedBlack.Beta
         {
             lock (this)
             {
-                internalTree.Add(new QueuePriority(priority), item);
+                _internalTree.Add(new QueuePriority(priority), item);
             }
         }
 
@@ -32,15 +33,15 @@ namespace System.Collections.Generic.RedBlack.Beta
         {
             lock (this)
             {
-                T result = internalTree.GetMinValue();
-                internalTree.RemoveMin();
+                T result = _internalTree.GetMinValue();
+                _internalTree.RemoveMin();
                 return result;
             }
         }
 
         public T Peek()
         {
-            return internalTree.GetMinValue();
+            return _internalTree.GetMinValue();
         }
 
         /// <summary>
@@ -52,7 +53,7 @@ namespace System.Collections.Generic.RedBlack.Beta
         /// <filterpriority>1</filterpriority>
         public IEnumerator<T> GetEnumerator()
         {
-            return internalTree.GetEnumerator();
+            return _internalTree.GetEnumerator();
         }
 
         /// <summary>
@@ -64,23 +65,24 @@ namespace System.Collections.Generic.RedBlack.Beta
         /// <filterpriority>2</filterpriority>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return internalTree.GetEnumerator();
+            return _internalTree.GetEnumerator();
         }
 
         /// <summary>
         /// Copies the elements of the <see cref="T:System.Collections.ICollection"/> to an <see cref="T:System.Array"/>, starting at a particular <see cref="T:System.Array"/> index.
         /// </summary>
         /// <param name="array">The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from <see cref="T:System.Collections.ICollection"/>. The <see cref="T:System.Array"/> must have zero-based indexing. </param><param name="index">The zero-based index in <paramref name="array"/> at which copying begins. </param><exception cref="T:System.ArgumentNullException"><paramref name="array"/> is null. </exception><exception cref="T:System.ArgumentOutOfRangeException"><paramref name="index"/> is less than zero. </exception><exception cref="T:System.ArgumentException"><paramref name="array"/> is multidimensional.-or- The number of elements in the source <see cref="T:System.Collections.ICollection"/> is greater than the available space from <paramref name="index"/> to the end of the destination <paramref name="array"/>.-or-The type of the source <see cref="T:System.Collections.ICollection"/> cannot be cast automatically to the type of the destination <paramref name="array"/>.</exception><filterpriority>2</filterpriority>
+        [Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly")]
         public void CopyTo(Array array, int index)
         {
             if (index < 0)
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException("index", "Index cannot be less than 0");
             if (array == null)
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("array", "Array cannot be null");
             if ((array.Length - index) < Count)
                 throw new ArgumentException();
             int _currentPosition = index;
-            foreach (T item in internalTree.GetAll()
+            foreach (T item in _internalTree.GetAll()
                 .Select(i => i.Data))
             {
                 array.SetValue(item, _currentPosition);
@@ -95,7 +97,7 @@ namespace System.Collections.Generic.RedBlack.Beta
         /// The number of elements contained in the <see cref="T:System.Collections.ICollection"/>.
         /// </returns>
         /// <filterpriority>2</filterpriority>
-        public int Count { get { return internalTree.Count; } }
+        public int Count { get { return _internalTree.Count; } }
 
         /// <summary>
         /// Gets an object that can be used to synchronize access to the <see cref="T:System.Collections.ICollection"/>.
@@ -146,12 +148,13 @@ namespace System.Collections.Generic.RedBlack.Beta
             /// A value that indicates the relative order of the objects being compared. The return value has these meanings: Value Meaning Less than zero This instance precedes <paramref name="obj"/> in the sort order. Zero This instance occurs in the same position in the sort order as <paramref name="obj"/>. Greater than zero This instance follows <paramref name="obj"/> in the sort order. 
             /// </returns>
             /// <param name="obj">An object to compare with this instance. </param><exception cref="T:System.ArgumentException"><paramref name="obj"/> is not the same type as this instance. </exception><filterpriority>2</filterpriority>
+            [Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
             public int CompareTo(object obj)
             {
                 int compare = 0;
                 if (obj is QueuePriority)
                 {
-                    QueuePriority otherQueuePriority = (QueuePriority)obj;
+                    QueuePriority otherQueuePriority = obj as QueuePriority;
                     compare = Priority.CompareTo(otherQueuePriority.Priority);
                     if (compare == 0)
                         compare = Sequence.CompareTo(otherQueuePriority.Sequence);
