@@ -79,14 +79,6 @@
       <ProjName>Performance.RedBlack</ProjName>
     </ProjBinary>
   </Binaries>
-  <Reports>
-    <Report>
-      <Path>Performance.RedBlack121122(1).vsp</Path>
-    </Report>
-    <Report>
-      <Path>Performance.RedBlack121122(2).vsp</Path>
-    </Report>
-  </Reports>
   <Launches>
     <ProjBinary>
       <Path>:PB:{F5BDE3CA-6622-4B77-B066-9B210E59E566}|Performance.RedBlack\Performance.RedBlack.csproj</Path>

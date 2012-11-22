@@ -11,7 +11,7 @@ namespace System.Collections.Generic.RedBlack
     /// <example>
     /// var x = new RedBlackTree&lt;Guid,String&gt;();
     /// </example>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
+    [Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
     public class RedBlackTree<TKey, TValue> : IDictionary<TKey, TValue>
         where TValue : class
         where TKey : IComparable
@@ -131,7 +131,7 @@ namespace System.Collections.Generic.RedBlack
         /// GetMinKey
         /// Returns the minimum key value
         ///</summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        [Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public TKey GetMinKey()
         {
             RedBlackNode<TKey, TValue> workNode = _treeBaseNode;
@@ -152,7 +152,7 @@ namespace System.Collections.Generic.RedBlack
         /// GetMaxKey
         /// Returns the maximum key value
         ///</summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        [Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public TKey GetMaxKey()
         {
             RedBlackNode<TKey, TValue> workNode = _treeBaseNode;
@@ -173,7 +173,7 @@ namespace System.Collections.Generic.RedBlack
         /// GetMinValue
         /// Returns the object having the minimum key value
         ///</summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        [Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public TValue GetMinValue()
         {
             return GetData(GetMinKey());
@@ -183,7 +183,7 @@ namespace System.Collections.Generic.RedBlack
         /// GetMaxValue
         /// Returns the object having the maximum key
         ///</summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        [Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public TValue GetMaxValue()
         {
             return GetData(GetMaxKey());
@@ -267,7 +267,7 @@ namespace System.Collections.Generic.RedBlack
         /// Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1"/> to an <see cref="T:System.Array"/>, starting at a particular <see cref="T:System.Array"/> index.
         /// </summary>
         /// <param name="array">The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1"/>. The <see cref="T:System.Array"/> must have zero-based indexing.</param><param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param><exception cref="T:System.ArgumentNullException"><paramref name="array"/> is null.</exception><exception cref="T:System.ArgumentOutOfRangeException"><paramref name="arrayIndex"/> is less than 0.</exception><exception cref="T:System.ArgumentException"><paramref name="array"/> is multidimensional.-or-The number of elements in the source <see cref="T:System.Collections.Generic.ICollection`1"/> is greater than the available space from <paramref name="arrayIndex"/> to the end of the destination <paramref name="array"/>.-or-Type <paramref name="T"/> cannot be cast automatically to the type of the destination <paramref name="array"/>.</exception>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly")]
+        [Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly")]
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
             if (arrayIndex < 0)
@@ -454,7 +454,7 @@ namespace System.Collections.Generic.RedBlack
         /// </summary>
         public event EventHandler OnAdd;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
+        [Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
         protected void InvokeOnAdd(RedBlackEventArgs<TKey, TValue> e)
         {
             EventHandler handler = OnAdd;
@@ -466,7 +466,7 @@ namespace System.Collections.Generic.RedBlack
         /// </summary>
         public event EventHandler OnRemove;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
+        [Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
         protected void InvokeOnRemove(RedBlackEventArgs<TKey, TValue> e)
         {
             EventHandler handler = OnRemove;
