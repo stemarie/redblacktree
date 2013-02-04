@@ -14,7 +14,7 @@ namespace System.Collections.Generic.RedBlack
     [Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
     public class RedBlackTree<TKey, TValue> : IDictionary<TKey, TValue>
         where TValue : class
-        where TKey : IComparable
+        where TKey : IComparable<TKey>, IComparable, IEquatable<TKey>
     {
         internal enum RedBlackNodeType
         {
@@ -28,7 +28,7 @@ namespace System.Collections.Generic.RedBlack
         private int _intHashCode;
 
         // identifies the owner of the tree
-        private string _strIdentifier;
+        private int _strIdentifier;
 
         // the tree
         private RedBlackNode<TKey, TValue> _treeBaseNode = SentinelNode;
@@ -60,7 +60,7 @@ namespace System.Collections.Generic.RedBlack
         /// </example>
         public RedBlackTree()
         {
-            Initialize(base.ToString() + _rand.Next());
+            Initialize(_rand.Next());
         }
 
         /// <summary>
@@ -350,7 +350,7 @@ namespace System.Collections.Generic.RedBlack
         ///</summary>
         public override string ToString()
         {
-            return _strIdentifier;
+            return _strIdentifier.ToString();
         }
 
         /// <summary>
@@ -839,7 +839,7 @@ namespace System.Collections.Generic.RedBlack
                 rotateNode.Parent = workNode;
         }
 
-        private void Initialize(string identifier)
+        private void Initialize(int identifier)
         {
             _strIdentifier = identifier;
             _intHashCode = _rand.Next();

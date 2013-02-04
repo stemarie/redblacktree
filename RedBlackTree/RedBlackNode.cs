@@ -5,7 +5,7 @@ namespace System.Collections.Generic.RedBlack
     /// </summary>
     internal class RedBlackNode<TKey, TValue>
         where TValue : class
-        where TKey : IComparable
+        where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
     {
         public TValue Data { get; set; }
 

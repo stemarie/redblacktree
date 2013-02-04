@@ -13,7 +13,7 @@ namespace TestProject.RedBlackTree
     [TestClass]
     public class RedBlackTreeTests
     {
-        private TestContext testContextInstance;
+        private TestContext _testContextInstance;
 
         /// <summary>
         ///Gets or sets the test context which provides
@@ -23,11 +23,11 @@ namespace TestProject.RedBlackTree
         {
             get
             {
-                return testContextInstance;
+                return _testContextInstance;
             }
             set
             {
-                testContextInstance = value;
+                _testContextInstance = value;
             }
         }
 
@@ -65,11 +65,11 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for RedBlackTree`1 Constructor
         ///</summary>
-        public void RedBlackTreeConstructorTest1Helper<K, T>()
+        public void RedBlackTreeConstructorTest1Helper<TKey, T>()
             where T : class
-            where K : IComparable
+            where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
         {
-            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
+            RedBlackTree<TKey, T> target = new RedBlackTree<TKey, T>();
             Assert.IsTrue(target.IsEmpty());
             Assert.AreEqual(0, target.Count);
         }
@@ -83,11 +83,11 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for Add
         ///</summary>
-        public void AddTestHelper<K, T>(K key, T x)
+        public void AddTestHelper<TKey, T>(TKey key, T x)
             where T : class
-            where K : IComparable
+            where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
         {
-            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
+            RedBlackTree<TKey, T> target = new RedBlackTree<TKey, T>();
             T data = x;
             target.Add(key, data);
             Assert.AreEqual(x, data, "Objects are not the same");
@@ -104,11 +104,11 @@ namespace TestProject.RedBlackTree
         ///</summary>
         ///<param name="key"> </param>
         ///<param name="testItem"> </param>
-        public void ClearTestHelper<K, T>(K key, T testItem)
+        public void ClearTestHelper<TKey, T>(TKey key, T testItem)
             where T : class
-            where K : IComparable
+            where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
         {
-            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
+            RedBlackTree<TKey, T> target = new RedBlackTree<TKey, T>();
             Assert.IsTrue(target.IsEmpty());
             target.Add(key, testItem);
             Assert.AreEqual(1, target.Count);
@@ -125,11 +125,11 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for Contains
         ///</summary>
-        public void ContainsTestHelper<K, T>(K key, T testItem)
+        public void ContainsTestHelper<TKey, T>(TKey key, T testItem)
             where T : class
-            where K : IComparable
+            where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
         {
-            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
+            RedBlackTree<TKey, T> target = new RedBlackTree<TKey, T>();
             T item = testItem;
             const bool expected = false;
             bool actual = target.Contains(item);
@@ -145,12 +145,12 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for CopyTo
         ///</summary>
-        public void CopyToTestHelper<K, T>()
+        public void CopyToTestHelper<TKey, T>()
             where T : class
-            where K : IComparable
+            where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
         {
-            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
-            KeyValuePair<K, T>[] array = new KeyValuePair<K, T>[1];
+            RedBlackTree<TKey, T> target = new RedBlackTree<TKey, T>();
+            KeyValuePair<TKey, T>[] array = new KeyValuePair<TKey, T>[1];
             const int arrayIndex = 0;
             target.CopyTo(array, arrayIndex);
         }
@@ -164,11 +164,11 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for Equals
         ///</summary>
-        public void EqualsTestHelper<K, T>()
+        public void EqualsTestHelper<TKey, T>()
             where T : class
-            where K : IComparable
+            where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
         {
-            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
+            RedBlackTree<TKey, T> target = new RedBlackTree<TKey, T>();
             object obj = 5;
             const bool expected = false;
             bool actual = target.Equals(obj);
@@ -184,12 +184,11 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for GetData
         ///</summary>
-        public void GetDataTestHelper<K, T>(K key, T testItem)
+        public void GetDataTestHelper<TKey, T>(TKey key, T testItem)
             where T : class
-            where K : IComparable
+            where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
         {
-            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
-            target.Add(key, testItem);
+            RedBlackTree<TKey, T> target = new RedBlackTree<TKey, T> { { key, testItem } };
             T expected = testItem;
             T actual = target.GetData(key);
             Assert.AreEqual(expected, actual);
@@ -204,12 +203,12 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for GetEnumerator
         ///</summary>
-        public void GetEnumeratorTestHelper<K, T>(KeyValuePair<K, T>[] items)
+        public void GetEnumeratorTestHelper<TKey, T>(KeyValuePair<TKey, T>[] items)
             where T : class
-            where K : IComparable
+            where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
         {
-            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
-            foreach (KeyValuePair<K, T> item in items)
+            RedBlackTree<TKey, T> target = new RedBlackTree<TKey, T>();
+            foreach (KeyValuePair<TKey, T> item in items)
             {
                 target.Add(item);
             }
@@ -235,14 +234,14 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for GetMaxKey
         ///</summary>
-        public void GetMaxKeyTestHelper<K, T>(KeyValuePair<K, T>[] items, K max)
+        public void GetMaxKeyTestHelper<TKey, T>(KeyValuePair<TKey, T>[] items, TKey max)
             where T : class
-            where K : IComparable
+            where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
         {
-            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
-            foreach (KeyValuePair<K, T> item in items)
+            RedBlackTree<TKey, T> target = new RedBlackTree<TKey, T>();
+            foreach (KeyValuePair<TKey, T> item in items)
                 target.Add(item);
-            K expected = max;
+            TKey expected = max;
             IComparable actual = target.GetMaxKey();
             Assert.AreEqual(expected, actual);
         }
@@ -265,12 +264,12 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for GetMaxValue
         ///</summary>
-        public void GetMaxValueTestHelper<K, T>(KeyValuePair<K, T>[] items, T max)
+        public void GetMaxValueTestHelper<TKey, T>(KeyValuePair<TKey, T>[] items, T max)
             where T : class
-            where K : IComparable
+            where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
         {
-            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
-            foreach (KeyValuePair<K, T> item in items)
+            RedBlackTree<TKey, T> target = new RedBlackTree<TKey, T>();
+            foreach (KeyValuePair<TKey, T> item in items)
                 target.Add(item);
             T expected = max;
             T actual = target.GetMaxValue();
@@ -294,12 +293,12 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for GetMinKey
         ///</summary>
-        public void GetMinKeyTestHelper<K, T>(KeyValuePair<K, T>[] items, K min)
+        public void GetMinKeyTestHelper<TKey, T>(KeyValuePair<TKey, T>[] items, TKey min)
             where T : class
-            where K : IComparable
+            where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
         {
-            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
-            foreach (KeyValuePair<K, T> item in items)
+            RedBlackTree<TKey, T> target = new RedBlackTree<TKey, T>();
+            foreach (KeyValuePair<TKey, T> item in items)
                 target.Add(item);
             IComparable expected = min;
             IComparable actual = target.GetMinKey();
@@ -323,12 +322,12 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for GetMinValue
         ///</summary>
-        public void GetMinValueTestHelper<K, T>(KeyValuePair<K, T>[] items, T min)
+        public void GetMinValueTestHelper<TKey, T>(KeyValuePair<TKey, T>[] items, T min)
             where T : class
-            where K : IComparable
+            where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
         {
-            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
-            foreach (KeyValuePair<K, T> item in items)
+            RedBlackTree<TKey, T> target = new RedBlackTree<TKey, T>();
+            foreach (KeyValuePair<TKey, T> item in items)
                 target.Add(item);
             T expected = min;
             T actual = target.GetMinValue();
@@ -352,11 +351,11 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for IsEmpty
         ///</summary>
-        public void IsEmptyTestHelper<K, T>()
+        public void IsEmptyTestHelper<TKey, T>()
             where T : class
-            where K : IComparable
+            where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
         {
-            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
+            RedBlackTree<TKey, T> target = new RedBlackTree<TKey, T>();
             const bool expected = true;
             bool actual = target.IsEmpty();
             Assert.AreEqual(expected, actual);
@@ -371,12 +370,11 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for Remove
         ///</summary>
-        public void RemoveTestHelper<K, T>(KeyValuePair<K, T> item)
+        public void RemoveTestHelper<TKey, T>(KeyValuePair<TKey, T> item)
             where T : class
-            where K : IComparable
+            where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
         {
-            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
-            target.Add(item);
+            RedBlackTree<TKey, T> target = new RedBlackTree<TKey, T> { item };
             const bool expected = true;
             bool actual = target.Remove(item);
             Assert.AreEqual(expected, actual);
@@ -392,13 +390,12 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for Remove
         ///</summary>
-        public void RemoveTest1Helper<K, T>(KeyValuePair<K, T> item)
+        public void RemoveTest1Helper<TKey, T>(KeyValuePair<TKey, T> item)
             where T : class
-            where K : IComparable
+            where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
         {
-            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
-            target.Add(item);
-            K key = item.Key;
+            RedBlackTree<TKey, T> target = new RedBlackTree<TKey, T> { item };
+            TKey key = item.Key;
             target.Remove(key);
             Assert.IsTrue(target.IsEmpty());
         }
@@ -413,12 +410,12 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for RemoveMax
         ///</summary>
-        public void RemoveMaxTestHelper<K, T>(KeyValuePair<K, T>[] items, K min, K max)
+        public void RemoveMaxTestHelper<TKey, T>(KeyValuePair<TKey, T>[] items, TKey min, TKey max)
             where T : class
-            where K : IComparable
+            where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
         {
-            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
-            foreach (KeyValuePair<K, T> item in items)
+            RedBlackTree<TKey, T> target = new RedBlackTree<TKey, T>();
+            foreach (KeyValuePair<TKey, T> item in items)
                 target.Add(item);
             Assert.AreEqual(max, target.GetMaxKey());
             target.RemoveMax();
@@ -440,12 +437,12 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for RemoveMin
         ///</summary>
-        public void RemoveMinTestHelper<K, T>(KeyValuePair<K, T>[] items, K min, K max)
+        public void RemoveMinTestHelper<TKey, T>(KeyValuePair<TKey, T>[] items, TKey min, TKey max)
             where T : class
-            where K : IComparable
+            where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
         {
-            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
-            foreach (KeyValuePair<K, T> item in items)
+            RedBlackTree<TKey, T> target = new RedBlackTree<TKey, T>();
+            foreach (KeyValuePair<TKey, T> item in items)
                 target.Add(item);
             Assert.AreEqual(min, target.GetMinKey());
             target.RemoveMin();
@@ -467,11 +464,11 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for Count
         ///</summary>
-        public void CountTestHelper<K, T>(KeyValuePair<K, T> x)
+        public void CountTestHelper<TKey, T>(KeyValuePair<TKey, T> x)
             where T : class
-            where K : IComparable
+            where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
         {
-            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
+            RedBlackTree<TKey, T> target = new RedBlackTree<TKey, T>();
             Assert.AreEqual(0, target.Count);
             target.Add(x);
             const int expected = 1;
@@ -490,11 +487,11 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for IsReadOnly
         ///</summary>
-        public void IsReadOnlyTestHelper<K, T>()
+        public void IsReadOnlyTestHelper<TKey, T>()
             where T : class
-            where K : IComparable
+            where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
         {
-            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
+            RedBlackTree<TKey, T> target = new RedBlackTree<TKey, T>();
             bool actual = target.IsReadOnly;
             Assert.IsFalse(actual);
         }
@@ -508,13 +505,12 @@ namespace TestProject.RedBlackTree
         /// <summary>
         ///A test for Item
         ///</summary>
-        public void ItemTestHelper<K, T>(KeyValuePair<K, T> item)
+        public void ItemTestHelper<TKey, T>(KeyValuePair<TKey, T> item)
             where T : class
-            where K : IComparable
+            where TKey : IComparable, IComparable<TKey>, IEquatable<TKey>
         {
-            RedBlackTree<K, T> target = new RedBlackTree<K, T>();
-            target.Add(item);
-            K key = item.Key;
+            RedBlackTree<TKey, T> target = new RedBlackTree<TKey, T> { item };
+            TKey key = item.Key;
             T expected = item.Value;
             target[key] = expected;
             T actual = target[key];

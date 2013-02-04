@@ -6,8 +6,7 @@ namespace System.Collections.Generic.RedBlack.Beta
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
     public class RedBlackTreePersistent<TKey, TValue>
         : RedBlackTree<TKey, TValue>
-        where TKey : IComparable
-        where TValue : class
+        where TKey : IComparable, IComparable<TKey>, IEquatable<TKey> where TValue : class
     {
         private readonly string _path;
         private readonly XmlSerializer _serializer;

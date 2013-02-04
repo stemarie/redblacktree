@@ -119,7 +119,7 @@ namespace System.Collections.Generic.RedBlack.Beta
 
         #region "Private"
 
-        internal class QueuePriority : IComparable
+        internal class QueuePriority : IComparable<QueuePriority>, IComparable, IEquatable<QueuePriority>
         {
             public byte Priority { get; set; }
             public long Sequence { get; private set; }
@@ -141,6 +141,16 @@ namespace System.Collections.Generic.RedBlack.Beta
                 Sequence = DateTime.UtcNow.Ticks;
             }
 
+            public int CompareTo(QueuePriority other)
+            {
+                int compare = 0;
+                compare = Priority.CompareTo(other.Priority);
+                if (compare == 0)
+                    compare = Sequence.CompareTo(other.Sequence);
+
+                return compare;
+            }
+
             /// <summary>
             /// Compares the current instance with another object of the same type and returns an integer that indicates whether the current instance precedes, follows, or occurs in the same position in the sort order as the other object.
             /// </summary>
@@ -148,18 +158,19 @@ namespace System.Collections.Generic.RedBlack.Beta
             /// A value that indicates the relative order of the objects being compared. The return value has these meanings: Value Meaning Less than zero This instance precedes <paramref name="obj"/> in the sort order. Zero This instance occurs in the same position in the sort order as <paramref name="obj"/>. Greater than zero This instance follows <paramref name="obj"/> in the sort order. 
             /// </returns>
             /// <param name="obj">An object to compare with this instance. </param><exception cref="T:System.ArgumentException"><paramref name="obj"/> is not the same type as this instance. </exception><filterpriority>2</filterpriority>
-            [Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1800:DoNotCastUnnecessarily")]
             public int CompareTo(object obj)
             {
-                int compare = 0;
-                if (obj is QueuePriority)
-                {
-                    QueuePriority otherQueuePriority = obj as QueuePriority;
-                    compare = Priority.CompareTo(otherQueuePriority.Priority);
-                    if (compare == 0)
-                        compare = Sequence.CompareTo(otherQueuePriority.Sequence);
-                }
-                return compare;
+                QueuePriority castedOther = obj as QueuePriority;
+                if (castedOther != null)
+                    return CompareTo(castedOther);
+                return 0;
+            }
+
+            public bool Equals(QueuePriority other)
+            {
+// ReSharper disable SuspiciousTypeConversion.Global
+                return Priority.Equals(other) && Sequence.Equals(other);
+// ReSharper restore SuspiciousTypeConversion.Global
             }
         }
 
