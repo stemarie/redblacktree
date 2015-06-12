@@ -619,6 +619,11 @@ namespace System.Collections.Generic.RedBlack
                 {
                     // y is x's sibling
                     workNode = linkedNode.Parent.Right;
+                    if (workNode == SentinelNode)
+                    {
+                        // Not sure what to do here, but something is wrong if worknode is a sentinel node as it leads to null ref below
+                    }
+
                     if (workNode.Color == RedBlackNodeType.Red)
                     {
                         // x is black, y is red - make both black and rotate
@@ -655,6 +660,11 @@ namespace System.Collections.Generic.RedBlack
                 else
                 {	// right subtree - same as code above with right and left swapped
                     workNode = linkedNode.Parent.Left;
+                    if (workNode == SentinelNode)
+                    {
+                        // Not sure what to do here, but something is wrong if worknode is a sentinel node, as it leads to a null ref below
+                    }
+
                     if (workNode.Color == RedBlackNodeType.Red)
                     {
                         linkedNode.Parent.Color = RedBlackNodeType.Red;

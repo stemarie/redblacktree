@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Generic.RedBlack;
+using System.Diagnostics;
+using System.IO;
 
 namespace Test
 {
@@ -10,6 +12,25 @@ namespace Test
 
         static public void Main()
         {
+            var rb = new RedBlackTree<double, string>();
+            var data = File.ReadAllLines(@"rbtest.txt");
+
+            foreach (var line in data)
+            {
+                if (line.StartsWith("D"))
+                {
+                    var v = Double.Parse(line.Split('=')[1]);
+                    if (!rb.Remove(v))
+                    {
+                        Debug.WriteLine("delete returned false: " + v);
+                    }
+                }
+                else
+                {
+                    rb.Add(Double.Parse(line), line);
+                }
+            }
+
             // create MyObjs containing key and string data
             MyObj obj1 = new MyObj("MyObj 1");
             MyObj obj2 = new MyObj("MyObj 2");
