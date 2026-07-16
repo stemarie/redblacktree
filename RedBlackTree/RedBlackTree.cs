@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Threading;
 
 namespace System.Collections.Generic.RedBlack
@@ -195,7 +194,8 @@ namespace System.Collections.Generic.RedBlack
         ///</summary>
         public IEnumerator<TValue> GetEnumerator()
         {
-            return GetAll().Select(i => i.Data).GetEnumerator();
+            foreach (RedBlackNode<TKey, TValue> node in EnumerateNodes())
+                yield return node.Data;
         }
 
         ///<summary>
@@ -277,10 +277,9 @@ namespace System.Collections.Generic.RedBlack
             if ((array.Length - arrayIndex) < Count)
                 throw new ArgumentException();
             int currentPosition = arrayIndex;
-            foreach (TValue item in GetAll()
-                .Select(i => i.Data))
+            foreach (RedBlackNode<TKey, TValue> node in EnumerateNodes())
             {
-                array.SetValue(item, currentPosition);
+                array[currentPosition] = new KeyValuePair<TKey, TValue>(node.Key, node.Data);
                 currentPosition++;
             }
         }
@@ -294,7 +293,11 @@ namespace System.Collections.Generic.RedBlack
         /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
         public bool Contains(TValue item)
         {
-            return GetAll().Select(i => i.Data).Any(i => i == item);
+            foreach (RedBlackNode<TKey, TValue> node in EnumerateNodes())
+                if (node.Data == item)
+                    return true;
+
+            return false;
         }
 
         ///<summary>
@@ -328,7 +331,7 @@ namespace System.Collections.Generic.RedBlack
         /// <filterpriority>2</filterpriority>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return GetAll().GetEnumerator();
+            return ((IEnumerable<KeyValuePair<TKey, TValue>>)this).GetEnumerator();
         }
 
         /// <summary>
@@ -340,9 +343,8 @@ namespace System.Collections.Generic.RedBlack
         /// <filterpriority>1</filterpriority>
         IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator()
         {
-            return GetAll()
-                .Select(i => new KeyValuePair<TKey, TValue>(i.Key, i.Data))
-                .GetEnumerator();
+            foreach (RedBlackNode<TKey, TValue> node in EnumerateNodes())
+                yield return new KeyValuePair<TKey, TValue>(node.Key, node.Data);
         }
 
         ///<summary>
@@ -391,15 +393,12 @@ namespace System.Collections.Generic.RedBlack
         /// <param name="key">The key of the element to remove.</param><exception cref="T:System.ArgumentNullException"><paramref name="key"/> is null.</exception><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.IDictionary`2"/> is read-only.</exception>
         public virtual bool Remove(TKey key)
         {
-            try
-            {
-                Delete(GetNode(key));
-                return true;
-            }
-            catch (Exception)
-            {
+            RedBlackNode<TKey, TValue> node = GetNode(key);
+            if (node == null)
                 return false;
-            }
+
+            Delete(node);
+            return true;
         }
 
         /// <summary>
@@ -411,8 +410,15 @@ namespace System.Collections.Generic.RedBlack
         /// <param name="key">The key whose value to get.</param><param name="value">When this method returns, the value associated with the specified key, if the key is found; otherwise, the default value for the type of the <paramref name="value"/> parameter. This parameter is passed uninitialized.</param><exception cref="T:System.ArgumentNullException"><paramref name="key"/> is null.</exception>
         public bool TryGetValue(TKey key, out TValue value)
         {
-            value = GetNode(key).Data;
-            return (value != null);
+            RedBlackNode<TKey, TValue> node = GetNode(key);
+            if (node == null)
+            {
+                value = default(TValue);
+                return false;
+            }
+
+            value = node.Data;
+            return true;
         }
 
         /// <summary>
@@ -436,7 +442,14 @@ namespace System.Collections.Generic.RedBlack
         /// </returns>
         public ICollection<TKey> Keys
         {
-            get { return GetAll().Select(i => i.Key).ToArray(); }
+            get
+            {
+                TKey[] keys = new TKey[Count];
+                int index = 0;
+                foreach (RedBlackNode<TKey, TValue> node in EnumerateNodes())
+                    keys[index++] = node.Key;
+                return keys;
+            }
         }
 
         /// <summary>
@@ -447,7 +460,14 @@ namespace System.Collections.Generic.RedBlack
         /// </returns>
         public ICollection<TValue> Values
         {
-            get { return GetAll().Select(i => i.Data).ToArray(); }
+            get
+            {
+                TValue[] values = new TValue[Count];
+                int index = 0;
+                foreach (RedBlackNode<TKey, TValue> node in EnumerateNodes())
+                    values[index++] = node.Data;
+                return values;
+            }
         }
         /// <summary>
         /// Invoked when Item is added
@@ -686,6 +706,26 @@ namespace System.Collections.Generic.RedBlack
                 }
             }
             linkedNode.Color = RedBlackNodeType.Black;
+        }
+
+
+        private IEnumerable<RedBlackNode<TKey, TValue>> EnumerateNodes()
+        {
+            Stack<RedBlackNode<TKey, TValue>> nodes = new Stack<RedBlackNode<TKey, TValue>>();
+            RedBlackNode<TKey, TValue> current = _treeBaseNode;
+
+            while (nodes.Count > 0 || current != SentinelNode)
+            {
+                while (current != SentinelNode)
+                {
+                    nodes.Push(current);
+                    current = current.Left;
+                }
+
+                current = nodes.Pop();
+                yield return current;
+                current = current.Right;
+            }
         }
 
         internal Stack<RedBlackNode<TKey, TValue>> GetAll()

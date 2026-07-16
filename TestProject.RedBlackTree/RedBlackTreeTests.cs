@@ -161,6 +161,37 @@ namespace TestProject.RedBlackTree
             CopyToTestHelper<string, GenericParameterHelper>();
         }
 
+        [TestMethod]
+        public void CopyToPopulatesKeyValuePairsInKeyOrder()
+        {
+            RedBlackTree<int, GenericParameterHelper> target = new RedBlackTree<int, GenericParameterHelper>();
+            GenericParameterHelper one = new GenericParameterHelper(1);
+            GenericParameterHelper two = new GenericParameterHelper(2);
+
+            target.Add(2, two);
+            target.Add(1, one);
+
+            KeyValuePair<int, GenericParameterHelper>[] array = new KeyValuePair<int, GenericParameterHelper>[2];
+            target.CopyTo(array, 0);
+
+            Assert.AreEqual(1, array[0].Key);
+            Assert.AreSame(one, array[0].Value);
+            Assert.AreEqual(2, array[1].Key);
+            Assert.AreSame(two, array[1].Value);
+        }
+
+        [TestMethod]
+        public void TryGetValueReturnsFalseForMissingKey()
+        {
+            RedBlackTree<int, GenericParameterHelper> target = new RedBlackTree<int, GenericParameterHelper>();
+            GenericParameterHelper value;
+
+            bool found = target.TryGetValue(42, out value);
+
+            Assert.IsFalse(found);
+            Assert.IsNull(value);
+        }
+
         /// <summary>
         ///A test for Equals
         ///</summary>
